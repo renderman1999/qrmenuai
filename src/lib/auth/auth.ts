@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth'
+import NextAuth, { getServerSession } from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import FacebookProvider from 'next-auth/providers/facebook'
@@ -6,7 +6,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '../db/prisma'
 import bcrypt from 'bcryptjs'
 
-const handler = NextAuth({
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -71,6 +71,11 @@ const handler = NextAuth({
     signIn: '/auth/signin',
     error: '/auth/error',
   },
-})
+}
 
-export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions)
+
+// Export auth function for server components
+export const auth = getServerSession(authOptions)
+
+export { getServerSession, handler as GET, handler as POST }
