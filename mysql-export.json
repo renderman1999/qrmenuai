@@ -1,0 +1,1573 @@
+{
+  "users": [
+    {
+      "id": "cmgt24r960000krepgtfek344",
+      "email": "admin@demorestaurant.com",
+      "name": "Admin Demo",
+      "image": null,
+      "role": "RESTAURANT_OWNER",
+      "createdAt": "2025-10-16T06:47:07.770Z",
+      "updatedAt": "2025-10-16T06:47:07.770Z"
+    },
+    {
+      "id": "cmgt24r9l0001krepn03rbivi",
+      "email": "ristorante1@example.com",
+      "name": "Ristorante1 Owner",
+      "image": null,
+      "role": "RESTAURANT_OWNER",
+      "createdAt": "2025-10-16T06:47:07.786Z",
+      "updatedAt": "2025-10-16T06:47:07.786Z"
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "ristorante1-restaurant",
+      "name": "La lampara",
+      "description": "Dal 1956 offriamo ai nostri clienti il pescato del giorno. Specialità Gmabero Rosso di Mazzara del Vallo.",
+      "address": "Via del litorale 134, Trapani (TP)",
+      "phone": "+39-123-456-7890",
+      "email": "info@lalamparatrapani.com",
+      "website": null,
+      "logo": "/uploads/profiles/restaurants/ristorante1-restaurant/1760607646655_f418eucm7ye.webp",
+      "coverImage": null,
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:07.794Z",
+      "updatedAt": "2025-10-16T10:11:54.080Z",
+      "licenseTier": "BASIC",
+      "licenseExpires": null,
+      "ownerId": "cmgt24r9l0001krepn03rbivi"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cmgt2dqu10001krnse31y4y24",
+      "name": "Primi Piatti",
+      "description": "Categoria Primi Piatti",
+      "sortOrder": 1,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.130Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    },
+    {
+      "id": "cmgt2dqu20003krnsda0bjykj",
+      "name": "Secondi Piatti",
+      "description": "Categoria Secondi Piatti",
+      "sortOrder": 2,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.131Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    },
+    {
+      "id": "cmgt2dquc0005krnsbn49vcfv",
+      "name": "Contorni",
+      "description": "Categoria Contorni",
+      "sortOrder": 3,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.141Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    },
+    {
+      "id": "cmgt2dque0007krns1z24m22a",
+      "name": "Dolci",
+      "description": "Categoria Dolci",
+      "sortOrder": 4,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.142Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    },
+    {
+      "id": "cmgt2dque0009krnslnqwqag3",
+      "name": "Bevande",
+      "description": "Categoria Bevande",
+      "sortOrder": 5,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.143Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    },
+    {
+      "id": "cmgt2dquh000bkrnshdfkzihl",
+      "name": "Antipasti",
+      "description": "Categoria Antipasti",
+      "sortOrder": 0,
+      "isActive": true,
+      "availability": null,
+      "isPreset": false,
+      "createdAt": "2025-10-16T06:54:07.145Z",
+      "updatedAt": "2025-10-16T09:24:29.335Z",
+      "menuId": "ristorante1-menu"
+    }
+  ],
+  "dishes": [
+    {
+      "id": "cmgt5e3g3004ukrns41l9xhbq",
+      "name": "Spaghetti con le vongole",
+      "description": "Gli spaghetti con le vongole sono un classico della cucina italiana, in particolare della tradizione napoletana. Preparati con vongole fresche, olio extravergine d’oliva, aglio, prezzemolo e un tocco di vino bianco, questo piatto esalta i sapori del mare in un equilibrio perfetto tra semplicità e raffinatezza. Ideale sia per un pranzo estivo che per una cena elegante, rappresenta uno dei simboli più amati della cucina mediterranea.",
+      "price": "18",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760602576050_qnhds5z38ak.webp",
+      "galleryEnabled": true,
+      "galleryImages": [
+        {
+          "alt": "",
+          "url": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760602620573_ax6hmgoah94.webp",
+          "order": 0
+        },
+        {
+          "alt": "",
+          "url": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760602624144_07yn872tprb.webp",
+          "order": 1
+        }
+      ],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T08:18:22.324Z",
+      "updatedAt": "2025-10-16T10:30:21.254Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    },
+    {
+      "id": "cmgt7ual7000vkrw2l8x9xvva",
+      "name": "Tataky di tonno in crosta di pistacchio",
+      "description": "Il tataki di tonno in crosta di pistacchio è un piatto raffinato di ispirazione giapponese, preparato scottando brevemente il tonno fresco per mantenerlo tenero e rosato all’interno. La crosta di pistacchi tritati aggiunge una nota croccante e aromatica che esalta il sapore delicato del pesce.",
+      "price": "16",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760606736208_vbr08vr6pjf.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T09:26:57.307Z",
+      "updatedAt": "2025-10-16T09:26:57.307Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dquh000bkrnshdfkzihl"
+    },
+    {
+      "id": "cmgt7xua30017krw2vklgj4ym",
+      "name": "Soutè di cozze",
+      "description": "Il soutè di cozze è un piatto semplice e gustoso della tradizione mediterranea. Le cozze fresche vengono aperte in padella con olio extravergine d’oliva, aglio, prezzemolo e un tocco di vino bianco, creando un profumo intenso di mare. Servito caldo con pane tostato per raccogliere il delizioso sughetto, è un antipasto perfetto che racchiude tutto il sapore autentico del mare.",
+      "price": "15",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760606909448_uqh98bcscci.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T09:29:42.795Z",
+      "updatedAt": "2025-10-16T10:42:17.431Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dquh000bkrnshdfkzihl"
+    },
+    {
+      "id": "cmgt9kor00005kryvvzux46e9",
+      "name": "Polpo e Patate",
+      "description": "Il polpo e patate è un piatto tipico della cucina mediterranea, semplice ma ricco di sapore. Il polpo bollito viene tagliato a pezzi e unito a patate lesse, olio extravergine d’oliva, prezzemolo fresco e un tocco di limone o aceto. Servito tiepido o freddo, è un antipasto leggero e raffinato, perfetto per esaltare la freschezza del pesce e la genuinità degli ingredienti.",
+      "price": "15",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760609647050_4bi8inap9ae.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": true,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T10:15:28.333Z",
+      "updatedAt": "2025-10-16T10:15:28.333Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dquh000bkrnshdfkzihl"
+    },
+    {
+      "id": "cmgt9ob8h000ekryv2mcksm3v",
+      "name": "Frittura di moscardini",
+      "description": "La frittura di moscardini è un piatto sfizioso e croccante tipico della cucina di mare italiana. I moscardini freschi, simili ai piccoli polpi, vengono infarinati e fritti in olio caldo fino a ottenere una doratura perfetta. Croccanti fuori e teneri dentro, sono ideali come antipasto o secondo di pesce, accompagnati da spicchi di limone per esaltarne il gusto.",
+      "price": "12",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760609801295_kq9xtz8e3o.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T10:18:17.441Z",
+      "updatedAt": "2025-10-16T10:42:25.086Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dquh000bkrnshdfkzihl"
+    },
+    {
+      "id": "cmgt9rohi000okryvz88plgy8",
+      "name": "Spaghetti ai Lupini",
+      "description": "Gli spaghetti ai lupini sono un primo piatto di mare profumato e saporito, tipico della cucina costiera italiana. I lupini di mare, piccoli molluschi simili alle vongole, vengono saltati in padella con olio extravergine d’oliva, aglio, prezzemolo e un tocco di vino bianco, creando un condimento ricco e aromatico che avvolge perfettamente la pasta.",
+      "price": "16",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760610000561_ex7u4s4agmw.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 1,
+      "createdAt": "2025-10-16T10:20:54.582Z",
+      "updatedAt": "2025-10-16T10:30:21.254Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    },
+    {
+      "id": "cmgt9uayi000zkryvsgm769m2",
+      "name": "Risotto alla crema di scampi",
+      "description": "Il risotto alla crema di scampi è un piatto elegante e raffinato della tradizione italiana, amato per il suo sapore delicato e la consistenza cremosa. Gli scampi freschi vengono utilizzati per preparare una crema vellutata che avvolge il riso, arricchita con olio extravergine d’oliva, vino bianco e un tocco di panna. Il risultato è un risotto dal profumo intenso di mare, morbido e armonioso, perfetto per le occasioni speciali.",
+      "price": "16",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760610121299_lp7dsc6lrac.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 2,
+      "createdAt": "2025-10-16T10:22:57.019Z",
+      "updatedAt": "2025-10-16T10:30:21.254Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    },
+    {
+      "id": "cmgt9x61e0019kryvjwqyi5cf",
+      "name": "Filetto di branzino al forno con verdure mediterranee",
+      "description": "Il filetto di branzino al forno con verdure mediterranee è un secondo piatto sano e profumato, completamente senza glutine. Il branzino fresco viene cotto al forno con pomodorini, zucchine, peperoni e olive, insaporito con olio extravergine d’oliva, aglio e origano. Leggero ma ricco di gusto, esalta i sapori genuini del mare e dell’orto mediterraneo.",
+      "price": "18",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760610246749_lcs88fw2gdc.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 3,
+      "createdAt": "2025-10-16T10:25:10.610Z",
+      "updatedAt": "2025-10-16T10:35:06.693Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu20003krnsda0bjykj"
+    },
+    {
+      "id": "cmgtb38oa004hkryveyuy7a80",
+      "name": "Cous cous di verdure alla curcuma",
+      "description": "Il cous cous di verdure alla  curcuma è un piatto colorato, leggero e ricco di sapori. Preparato con cous cous di mais o riso (senza glutine) e un mix di verdure di stagione — come zucchine, peperoni, melanzane e carote — saltate con olio extravergine d’oliva, cipolla e curcuma, offre un perfetto equilibrio tra gusto e benessere. Un piatto 100% vegetale",
+      "price": "14",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760612211857_qemugadnx2r.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": true,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T10:57:53.578Z",
+      "updatedAt": "2025-10-16T10:57:53.578Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    },
+    {
+      "id": "cmgtb5xqn004skryvrlt4wjoe",
+      "name": "Parmigiana di melanzane al forno",
+      "description": "parmigiana di melanzane al forno è un grande classico della cucina italiana, amata per la sua ricchezza di sapori e la sua consistenza cremosa. Le melanzane grigliate vengono alternate a strati di salsa di pomodoro, mozzarella e parmigiano grattugiato, poi cotte al forno fino a ottenere una superficie dorata e filante. Un piatto vegetariano nutriente e confortante, che racchiude tutta la bontà della tradizione mediterranea.",
+      "price": "11",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760612344221_93t7092pur5.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T10:59:59.375Z",
+      "updatedAt": "2025-10-16T10:59:59.375Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    },
+    {
+      "id": "cmgtbc5nc005gkryvz72fh3gs",
+      "name": "Pasta alla Norma",
+      "description": "La pasta alla Norma è un capolavoro della cucina siciliana, nata a Catania e dedicata alla celebre opera “Norma” di Vincenzo Bellini. È un primo piatto semplice ma ricco di gusto, che racchiude i profumi e i colori dell’isola: melanzane fritte, salsa di pomodoro fresco, basilico e ricotta salata grattugiata. Un’armonia perfetta di sapori mediterranei che rappresenta l’essenza della tradizione culinaria siciliana.",
+      "price": "18",
+      "image": "/uploads/profiles/restaurants/ristorante1-restaurant/dishes/temp/1760612628624_6csuh9t71cs.webp",
+      "galleryEnabled": false,
+      "galleryImages": [],
+      "isActive": true,
+      "availability": null,
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isSpicy": false,
+      "nutrition": null,
+      "sortOrder": 0,
+      "createdAt": "2025-10-16T11:04:49.560Z",
+      "updatedAt": "2025-10-16T11:04:49.560Z",
+      "aiAnalyzed": false,
+      "aiRecommendations": null,
+      "menuId": "ristorante1-menu",
+      "categoryId": "cmgt2dqu10001krnse31y4y24"
+    }
+  ],
+  "menus": [
+    {
+      "id": "ristorante1-menu",
+      "name": "Menu",
+      "description": "menu ordinario",
+      "isActive": true,
+      "availability": {},
+      "createdAt": "2025-10-16T06:47:07.810Z",
+      "updatedAt": "2025-10-16T10:12:24.768Z",
+      "restaurantId": "ristorante1-restaurant"
+    }
+  ],
+  "allergens": [
+    {
+      "id": "cmgt24v0q0000krh5ru4qv5xr",
+      "name": "Glutine",
+      "description": "Presente in grano, orzo, segale, avena",
+      "icon": "🌾",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.650Z",
+      "updatedAt": "2025-10-16T06:47:12.650Z"
+    },
+    {
+      "id": "cmgt24v170001krh5ali188pm",
+      "name": "Latte",
+      "description": "Latte e derivati del latte",
+      "icon": "🥛",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.667Z",
+      "updatedAt": "2025-10-16T06:47:12.667Z"
+    },
+    {
+      "id": "cmgt24v1m0002krh5q1spilmo",
+      "name": "Uova",
+      "description": "Uova e prodotti contenenti uova",
+      "icon": "🥚",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.681Z",
+      "updatedAt": "2025-10-16T06:47:12.681Z"
+    },
+    {
+      "id": "cmgt24v1y0003krh5mfq1kcf9",
+      "name": "Soia",
+      "description": "Soia e derivati della soia",
+      "icon": "🫘",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.694Z",
+      "updatedAt": "2025-10-16T06:47:12.694Z"
+    },
+    {
+      "id": "cmgt24v2a0004krh5q3ztqo15",
+      "name": "Noci",
+      "description": "Noci, mandorle, nocciole, pistacchi",
+      "icon": "🥜",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.706Z",
+      "updatedAt": "2025-10-16T06:47:12.706Z"
+    },
+    {
+      "id": "cmgt24v2n0005krh5zpo4459m",
+      "name": "Arachidi",
+      "description": "Arachidi e derivati",
+      "icon": "🥜",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.719Z",
+      "updatedAt": "2025-10-16T06:47:12.719Z"
+    },
+    {
+      "id": "cmgt24v2v0006krh54hln5ikr",
+      "name": "Pesce",
+      "description": "Pesce e derivati",
+      "icon": "🐟",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.727Z",
+      "updatedAt": "2025-10-16T06:47:12.727Z"
+    },
+    {
+      "id": "cmgt24v340007krh5arc584ol",
+      "name": "Crostacei",
+      "description": "Gamberi, granchi, aragoste",
+      "icon": "🦐",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.737Z",
+      "updatedAt": "2025-10-16T06:47:12.737Z"
+    },
+    {
+      "id": "cmgt24v3g0008krh55hs30ch6",
+      "name": "Sedano",
+      "description": "Sedano e derivati",
+      "icon": "🥬",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.748Z",
+      "updatedAt": "2025-10-16T06:47:12.748Z"
+    },
+    {
+      "id": "cmgt24v3p0009krh5l31f9pa1",
+      "name": "Senape",
+      "description": "Senape e derivati",
+      "icon": "🌶️",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.757Z",
+      "updatedAt": "2025-10-16T06:47:12.757Z"
+    },
+    {
+      "id": "cmgt24v3y000akrh5w7f9wtxz",
+      "name": "Sesamo",
+      "description": "Semi di sesamo e derivati",
+      "icon": "🌰",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.767Z",
+      "updatedAt": "2025-10-16T06:47:12.767Z"
+    },
+    {
+      "id": "cmgt24v47000bkrh5em8mz597",
+      "name": "Solfiti",
+      "description": "Anidride solforosa e solfiti",
+      "icon": "⚗️",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.775Z",
+      "updatedAt": "2025-10-16T06:47:12.775Z"
+    },
+    {
+      "id": "cmgt24v4h000ckrh54uqx9i7h",
+      "name": "Lupini",
+      "description": "Lupini e derivati",
+      "icon": "🫘",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.785Z",
+      "updatedAt": "2025-10-16T06:47:12.785Z"
+    },
+    {
+      "id": "cmgt24v4s000dkrh5pdtlhae4",
+      "name": "Molluschi",
+      "description": "Cozze, vongole, ostriche",
+      "icon": "🐚",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.796Z",
+      "updatedAt": "2025-10-16T06:47:12.796Z"
+    }
+  ],
+  "ingredients": [
+    {
+      "id": "cmgt24v55000ekrh5vl8lcscx",
+      "name": "Pomodoro",
+      "description": "Pomodoro fresco",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.809Z",
+      "updatedAt": "2025-10-16T06:47:12.809Z"
+    },
+    {
+      "id": "cmgt24v5h000fkrh5y7aligif",
+      "name": "Cipolla",
+      "description": "Cipolla fresca",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.822Z",
+      "updatedAt": "2025-10-16T06:47:12.822Z"
+    },
+    {
+      "id": "cmgt24v5p000gkrh5mi81expt",
+      "name": "Aglio",
+      "description": "Aglio fresco",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.829Z",
+      "updatedAt": "2025-10-16T06:47:12.829Z"
+    },
+    {
+      "id": "cmgt24v5w000hkrh568w8lekd",
+      "name": "Basilico",
+      "description": "Basilico fresco",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.837Z",
+      "updatedAt": "2025-10-16T06:47:12.837Z"
+    },
+    {
+      "id": "cmgt24v63000ikrh5822sycg9",
+      "name": "Prezzemolo",
+      "description": "Prezzemolo fresco",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.843Z",
+      "updatedAt": "2025-10-16T06:47:12.843Z"
+    },
+    {
+      "id": "cmgt24v6a000jkrh5m3p9dnq9",
+      "name": "Oregano",
+      "description": "Oregano secco",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.850Z",
+      "updatedAt": "2025-10-16T06:47:12.850Z"
+    },
+    {
+      "id": "cmgt24v6h000kkrh54165rvbx",
+      "name": "Rosmarino",
+      "description": "Rosmarino fresco",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.857Z",
+      "updatedAt": "2025-10-16T06:47:12.857Z"
+    },
+    {
+      "id": "cmgt24v6q000lkrh5gu0xf27u",
+      "name": "Salvia",
+      "description": "Salvia fresca",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.866Z",
+      "updatedAt": "2025-10-16T06:47:12.866Z"
+    },
+    {
+      "id": "cmgt24v6y000mkrh5cauo0pt4",
+      "name": "Menta",
+      "description": "Menta fresca",
+      "category": "Erbe",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.874Z",
+      "updatedAt": "2025-10-16T06:47:12.874Z"
+    },
+    {
+      "id": "cmgt24v76000nkrh59gc0guur",
+      "name": "Rucola",
+      "description": "Rucola fresca",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.882Z",
+      "updatedAt": "2025-10-16T06:47:12.882Z"
+    },
+    {
+      "id": "cmgt24v7e000okrh54qc69c1l",
+      "name": "Lattuga",
+      "description": "Lattuga fresca",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.890Z",
+      "updatedAt": "2025-10-16T06:47:12.890Z"
+    },
+    {
+      "id": "cmgt24v7l000pkrh5t9zs8vzf",
+      "name": "Spinaci",
+      "description": "Spinaci freschi",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.897Z",
+      "updatedAt": "2025-10-16T06:47:12.897Z"
+    },
+    {
+      "id": "cmgt24v7r000qkrh5ywbdybna",
+      "name": "Zucchine",
+      "description": "Zucchine fresche",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.903Z",
+      "updatedAt": "2025-10-16T06:47:12.903Z"
+    },
+    {
+      "id": "cmgt24v7y000rkrh5acs4jo1w",
+      "name": "Melanzane",
+      "description": "Melanzane fresche",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.910Z",
+      "updatedAt": "2025-10-16T06:47:12.910Z"
+    },
+    {
+      "id": "cmgt24v85000skrh58ibek628",
+      "name": "Peperoni",
+      "description": "Peperoni freschi",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.918Z",
+      "updatedAt": "2025-10-16T06:47:12.918Z"
+    },
+    {
+      "id": "cmgt24v8d000tkrh5vs0l8p47",
+      "name": "Carote",
+      "description": "Carote fresche",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.925Z",
+      "updatedAt": "2025-10-16T06:47:12.925Z"
+    },
+    {
+      "id": "cmgt24v8k000ukrh5euks5ymw",
+      "name": "Sedano",
+      "description": "Sedano fresco",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.932Z",
+      "updatedAt": "2025-10-16T06:47:12.932Z"
+    },
+    {
+      "id": "cmgt24v8s000vkrh5y9tocqap",
+      "name": "Funghi",
+      "description": "Funghi freschi",
+      "category": "Verdure",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.940Z",
+      "updatedAt": "2025-10-16T06:47:12.940Z"
+    },
+    {
+      "id": "cmgt24v91000wkrh5dqp5dcxs",
+      "name": "Pollo",
+      "description": "Petto di pollo",
+      "category": "Carne",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.949Z",
+      "updatedAt": "2025-10-16T06:47:12.949Z"
+    },
+    {
+      "id": "cmgt24v9a000xkrh5e2vipcms",
+      "name": "Manzo",
+      "description": "Carne di manzo",
+      "category": "Carne",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.958Z",
+      "updatedAt": "2025-10-16T06:47:12.958Z"
+    },
+    {
+      "id": "cmgt24v9j000ykrh547agermw",
+      "name": "Maiale",
+      "description": "Carne di maiale",
+      "category": "Carne",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.967Z",
+      "updatedAt": "2025-10-16T06:47:12.967Z"
+    },
+    {
+      "id": "cmgt24v9s000zkrh5nhr4rik7",
+      "name": "Agnello",
+      "description": "Carne di agnello",
+      "category": "Carne",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.976Z",
+      "updatedAt": "2025-10-16T06:47:12.976Z"
+    },
+    {
+      "id": "cmgt24va10010krh597f5we4r",
+      "name": "Salmone",
+      "description": "Salmone fresco",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.985Z",
+      "updatedAt": "2025-10-16T06:47:12.985Z"
+    },
+    {
+      "id": "cmgt24va80011krh5lcexv557",
+      "name": "Tonno",
+      "description": "Tonno fresco",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:12.993Z",
+      "updatedAt": "2025-10-16T06:47:12.993Z"
+    },
+    {
+      "id": "cmgt24vai0012krh5w4cr2gm7",
+      "name": "Branzino",
+      "description": "Branzino fresco",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.002Z",
+      "updatedAt": "2025-10-16T06:47:13.002Z"
+    },
+    {
+      "id": "cmgt24vas0013krh55cjnrmik",
+      "name": "Gamberi",
+      "description": "Gamberi freschi",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.012Z",
+      "updatedAt": "2025-10-16T06:47:13.012Z"
+    },
+    {
+      "id": "cmgt24vb30014krh5hnsjhxhp",
+      "name": "Cozze",
+      "description": "Cozze fresche",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.023Z",
+      "updatedAt": "2025-10-16T06:47:13.023Z"
+    },
+    {
+      "id": "cmgt24vbb0015krh51bfnzdcd",
+      "name": "Vongole",
+      "description": "Vongole fresche",
+      "category": "Pesce",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.032Z",
+      "updatedAt": "2025-10-16T06:47:13.032Z"
+    },
+    {
+      "id": "cmgt24vbi0016krh5kzg8f06i",
+      "name": "Mozzarella",
+      "description": "Mozzarella di bufala",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.039Z",
+      "updatedAt": "2025-10-16T06:47:13.039Z"
+    },
+    {
+      "id": "cmgt24vbr0017krh5wupfp43f",
+      "name": "Parmigiano",
+      "description": "Parmigiano Reggiano",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.047Z",
+      "updatedAt": "2025-10-16T06:47:13.047Z"
+    },
+    {
+      "id": "cmgt24vby0018krh5ulyzbsmu",
+      "name": "Pecorino",
+      "description": "Pecorino Romano",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.054Z",
+      "updatedAt": "2025-10-16T06:47:13.054Z"
+    },
+    {
+      "id": "cmgt24vc60019krh511ng66rb",
+      "name": "Gorgonzola",
+      "description": "Gorgonzola DOP",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.062Z",
+      "updatedAt": "2025-10-16T06:47:13.062Z"
+    },
+    {
+      "id": "cmgt24vce001akrh5xnpx5mb0",
+      "name": "Ricotta",
+      "description": "Ricotta fresca",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.070Z",
+      "updatedAt": "2025-10-16T06:47:13.070Z"
+    },
+    {
+      "id": "cmgt24vck001bkrh53es4wt9c",
+      "name": "Burrata",
+      "description": "Burrata fresca",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.076Z",
+      "updatedAt": "2025-10-16T06:47:13.076Z"
+    },
+    {
+      "id": "cmgt24vcp001ckrh5405tvbb2",
+      "name": "Stracchino",
+      "description": "Stracchino fresco",
+      "category": "Latticini",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.081Z",
+      "updatedAt": "2025-10-16T06:47:13.081Z"
+    },
+    {
+      "id": "cmgt24vct001dkrh52m4qmhjt",
+      "name": "Pasta",
+      "description": "Pasta di semola",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.086Z",
+      "updatedAt": "2025-10-16T06:47:13.086Z"
+    },
+    {
+      "id": "cmgt24vcx001ekrh5l69uixdq",
+      "name": "Riso",
+      "description": "Riso Arborio",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.090Z",
+      "updatedAt": "2025-10-16T06:47:13.090Z"
+    },
+    {
+      "id": "cmgt24vd3001fkrh5rpzo457a",
+      "name": "Farro",
+      "description": "Farro perlato",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.096Z",
+      "updatedAt": "2025-10-16T06:47:13.096Z"
+    },
+    {
+      "id": "cmgt24vd8001gkrh5q1bh3jd8",
+      "name": "Orzo",
+      "description": "Orzo perlato",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.100Z",
+      "updatedAt": "2025-10-16T06:47:13.100Z"
+    },
+    {
+      "id": "cmgt24vdd001hkrh5waqi2fiv",
+      "name": "Quinoa",
+      "description": "Quinoa",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.105Z",
+      "updatedAt": "2025-10-16T06:47:13.105Z"
+    },
+    {
+      "id": "cmgt24vdj001ikrh55qg1ura9",
+      "name": "Pane",
+      "description": "Pane fresco",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.111Z",
+      "updatedAt": "2025-10-16T06:47:13.111Z"
+    },
+    {
+      "id": "cmgt24vdq001jkrh57c2rozjd",
+      "name": "Focaccia",
+      "description": "Focaccia",
+      "category": "Cereali",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.119Z",
+      "updatedAt": "2025-10-16T06:47:13.119Z"
+    },
+    {
+      "id": "cmgt24vdw001kkrh597gbuf4m",
+      "name": "Olio d'oliva",
+      "description": "Olio extravergine di oliva",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.124Z",
+      "updatedAt": "2025-10-16T06:47:13.124Z"
+    },
+    {
+      "id": "cmgt24ve2001lkrh5cazkcxbi",
+      "name": "Aceto balsamico",
+      "description": "Aceto balsamico di Modena",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.130Z",
+      "updatedAt": "2025-10-16T06:47:13.130Z"
+    },
+    {
+      "id": "cmgt24ve8001mkrh5ptnyhc2k",
+      "name": "Sale",
+      "description": "Sale marino",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.136Z",
+      "updatedAt": "2025-10-16T06:47:13.136Z"
+    },
+    {
+      "id": "cmgt24ved001nkrh58njac02q",
+      "name": "Pepe",
+      "description": "Pepe nero macinato",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.141Z",
+      "updatedAt": "2025-10-16T06:47:13.141Z"
+    },
+    {
+      "id": "cmgt24vei001okrh5w5i95gaz",
+      "name": "Olio di sesamo",
+      "description": "Olio di sesamo",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.146Z",
+      "updatedAt": "2025-10-16T06:47:13.146Z"
+    },
+    {
+      "id": "cmgt24ven001pkrh56hptzz7s",
+      "name": "Salsa di soia",
+      "description": "Salsa di soia",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.152Z",
+      "updatedAt": "2025-10-16T06:47:13.152Z"
+    },
+    {
+      "id": "cmgt24vew001qkrh5atqa2cm0",
+      "name": "Worcestershire",
+      "description": "Salsa Worcestershire",
+      "category": "Condimenti",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.160Z",
+      "updatedAt": "2025-10-16T06:47:13.160Z"
+    },
+    {
+      "id": "cmgt24vf0001rkrh5ageidw4v",
+      "name": "Limone",
+      "description": "Limone fresco",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.165Z",
+      "updatedAt": "2025-10-16T06:47:13.165Z"
+    },
+    {
+      "id": "cmgt24vf6001skrh5ppfzi80f",
+      "name": "Arancia",
+      "description": "Arancia fresca",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.170Z",
+      "updatedAt": "2025-10-16T06:47:13.170Z"
+    },
+    {
+      "id": "cmgt24vfb001tkrh5n3df1qrv",
+      "name": "Mela",
+      "description": "Mela fresca",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.176Z",
+      "updatedAt": "2025-10-16T06:47:13.176Z"
+    },
+    {
+      "id": "cmgt24vfg001ukrh5crfryuc9",
+      "name": "Pera",
+      "description": "Pera fresca",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.180Z",
+      "updatedAt": "2025-10-16T06:47:13.180Z"
+    },
+    {
+      "id": "cmgt24vfm001vkrh5ek8yhgje",
+      "name": "Uva",
+      "description": "Uva fresca",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.186Z",
+      "updatedAt": "2025-10-16T06:47:13.186Z"
+    },
+    {
+      "id": "cmgt24vfr001wkrh5rpvymxv5",
+      "name": "Fichi",
+      "description": "Fichi freschi",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.191Z",
+      "updatedAt": "2025-10-16T06:47:13.191Z"
+    },
+    {
+      "id": "cmgt24vfx001xkrh5ayo77muv",
+      "name": "Melograno",
+      "description": "Melograno fresco",
+      "category": "Frutta",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.197Z",
+      "updatedAt": "2025-10-16T06:47:13.197Z"
+    },
+    {
+      "id": "cmgt24vg4001ykrh5hgjrodkc",
+      "name": "Cannella",
+      "description": "Cannella in polvere",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.204Z",
+      "updatedAt": "2025-10-16T06:47:13.204Z"
+    },
+    {
+      "id": "cmgt24vgc001zkrh5r88a73x4",
+      "name": "Zenzero",
+      "description": "Zenzero fresco",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.212Z",
+      "updatedAt": "2025-10-16T06:47:13.212Z"
+    },
+    {
+      "id": "cmgt24vgg0020krh5ewlngz3q",
+      "name": "Curcuma",
+      "description": "Curcuma in polvere",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.217Z",
+      "updatedAt": "2025-10-16T06:47:13.217Z"
+    },
+    {
+      "id": "cmgt24vgn0021krh5f19zfl82",
+      "name": "Cumino",
+      "description": "Cumino in semi",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.223Z",
+      "updatedAt": "2025-10-16T06:47:13.223Z"
+    },
+    {
+      "id": "cmgt24vgu0022krh5kbp1roro",
+      "name": "Coriandolo",
+      "description": "Coriandolo fresco",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.230Z",
+      "updatedAt": "2025-10-16T06:47:13.230Z"
+    },
+    {
+      "id": "cmgt24vh60023krh5m767ru7v",
+      "name": "Cardamomo",
+      "description": "Cardamomo in semi",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.242Z",
+      "updatedAt": "2025-10-16T06:47:13.242Z"
+    },
+    {
+      "id": "cmgt24vhg0024krh5pzbufke4",
+      "name": "Chiodi di garofano",
+      "description": "Chiodi di garofano",
+      "category": "Spezie",
+      "isActive": true,
+      "availability": null,
+      "createdAt": "2025-10-16T06:47:13.252Z",
+      "updatedAt": "2025-10-16T06:47:13.252Z"
+    }
+  ],
+  "dishAllergens": [
+    {
+      "id": "cmgt5e3g3004wkrns0jw1luil",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "allergenId": "cmgt24v4s000dkrh5pdtlhae4",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt7ual8000xkrw2h7ym9nbu",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "allergenId": "cmgt24v1y0003krh5mfq1kcf9",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt7ual8000ykrw2v7p5p40e",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "allergenId": "cmgt24v2v0006krh54hln5ikr",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt9kor10007kryv44oky2kn",
+      "dishId": "cmgt9kor00005kryvvzux46e9",
+      "allergenId": "cmgt24v2v0006krh54hln5ikr",
+      "createdAt": "2025-10-16T10:15:28.333Z"
+    },
+    {
+      "id": "cmgt9rohi000qkryvyjq316co",
+      "dishId": "cmgt9rohi000okryvz88plgy8",
+      "allergenId": "cmgt24v4s000dkrh5pdtlhae4",
+      "createdAt": "2025-10-16T10:20:54.582Z"
+    },
+    {
+      "id": "cmgt9uayi0011kryvbfehgfxc",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "allergenId": "cmgt24v4s000dkrh5pdtlhae4",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9x61e001bkryv27uzqe0x",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "allergenId": "cmgt24v2v0006krh54hln5ikr",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgtajc8u0049kryvn4kcs45f",
+      "dishId": "cmgt9ob8h000ekryv2mcksm3v",
+      "allergenId": "cmgt24v0q0000krh5ru4qv5xr",
+      "createdAt": "2025-10-16T10:42:25.086Z"
+    },
+    {
+      "id": "cmgtajc8u004akryvwou4tos0",
+      "dishId": "cmgt9ob8h000ekryv2mcksm3v",
+      "allergenId": "cmgt24v2v0006krh54hln5ikr",
+      "createdAt": "2025-10-16T10:42:25.086Z"
+    },
+    {
+      "id": "cmgtajc8u004bkryvos5xzl85",
+      "dishId": "cmgt9ob8h000ekryv2mcksm3v",
+      "allergenId": "cmgt24v4s000dkrh5pdtlhae4",
+      "createdAt": "2025-10-16T10:42:25.086Z"
+    },
+    {
+      "id": "cmgtbc5nc005ikryvxkkcukb2",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "allergenId": "cmgt24v0q0000krh5ru4qv5xr",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005jkryvi74uxezo",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "allergenId": "cmgt24v170001krh5ali188pm",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    }
+  ],
+  "dishIngredients": [
+    {
+      "id": "cmgt5e3g3004ykrnshdjwhiyt",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "ingredientId": "cmgt24v5p000gkrh5mi81expt",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt5e3g3004zkrnsqyfiq5jw",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt5e3g30050krnsxwn1tjsj",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "ingredientId": "cmgt24vbb0015krh51bfnzdcd",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt5e3g30051krnsulv6stvr",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt5e3g30052krnsihqiuqkg",
+      "dishId": "cmgt5e3g3004ukrns41l9xhbq",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T08:18:22.324Z"
+    },
+    {
+      "id": "cmgt7ual80010krw2yfeggg3r",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "ingredientId": "cmgt24v7e000okrh54qc69c1l",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt7ual80011krw2b0icni99",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt7ual80012krw284yz2van",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "ingredientId": "cmgt24ved001nkrh58njac02q",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt7ual80013krw27k23npud",
+      "dishId": "cmgt7ual7000vkrw2l8x9xvva",
+      "ingredientId": "cmgt24ven001pkrh56hptzz7s",
+      "createdAt": "2025-10-16T09:26:57.307Z"
+    },
+    {
+      "id": "cmgt9kor10009kryvdsrb5xco",
+      "dishId": "cmgt9kor00005kryvvzux46e9",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T10:15:28.333Z"
+    },
+    {
+      "id": "cmgt9kor1000akryv35q96uvj",
+      "dishId": "cmgt9kor00005kryvvzux46e9",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:15:28.333Z"
+    },
+    {
+      "id": "cmgt9kor1000bkryv4jwkieak",
+      "dishId": "cmgt9kor00005kryvvzux46e9",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:15:28.333Z"
+    },
+    {
+      "id": "cmgt9kor1000ckryvc3v4frjp",
+      "dishId": "cmgt9kor00005kryvvzux46e9",
+      "ingredientId": "cmgt24ved001nkrh58njac02q",
+      "createdAt": "2025-10-16T10:15:28.333Z"
+    },
+    {
+      "id": "cmgt9rohi000skryvctmal3jd",
+      "dishId": "cmgt9rohi000okryvz88plgy8",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T10:20:54.582Z"
+    },
+    {
+      "id": "cmgt9rohi000tkryv2ag1zg8n",
+      "dishId": "cmgt9rohi000okryvz88plgy8",
+      "ingredientId": "cmgt24vct001dkrh52m4qmhjt",
+      "createdAt": "2025-10-16T10:20:54.582Z"
+    },
+    {
+      "id": "cmgt9rohi000ukryvs0nv574a",
+      "dishId": "cmgt9rohi000okryvz88plgy8",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:20:54.582Z"
+    },
+    {
+      "id": "cmgt9rohi000vkryvt65utto2",
+      "dishId": "cmgt9rohi000okryvz88plgy8",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:20:54.582Z"
+    },
+    {
+      "id": "cmgt9uayi0013kryvvbxqsvmz",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9uayi0014kryvcnsaxow6",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "ingredientId": "cmgt24vcx001ekrh5l69uixdq",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9uayi0015kryv5i61f0ii",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9uayi0016kryvf2icr9v6",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9uayi0017kryvxzq2phw7",
+      "dishId": "cmgt9uayi000zkryvsgm769m2",
+      "ingredientId": "cmgt24ved001nkrh58njac02q",
+      "createdAt": "2025-10-16T10:22:57.019Z"
+    },
+    {
+      "id": "cmgt9x61e001dkryvl2ju4lav",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "ingredientId": "cmgt24v55000ekrh5vl8lcscx",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgt9x61e001ekryvzsqztayf",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "ingredientId": "cmgt24v6a000jkrh5m3p9dnq9",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgt9x61e001fkryvr0yztv0i",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "ingredientId": "cmgt24v7r000qkrh5ywbdybna",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgt9x61e001gkryv88iwkuy7",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgt9x61e001hkryvdpwy6mvz",
+      "dishId": "cmgt9x61e0019kryvjwqyi5cf",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:25:10.610Z"
+    },
+    {
+      "id": "cmgtaj6c70045kryvhcvyihts",
+      "dishId": "cmgt7xua30017krw2vklgj4ym",
+      "ingredientId": "cmgt24v5p000gkrh5mi81expt",
+      "createdAt": "2025-10-16T10:42:17.431Z"
+    },
+    {
+      "id": "cmgtaj6c70046kryvi95otf5p",
+      "dishId": "cmgt7xua30017krw2vklgj4ym",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T10:42:17.431Z"
+    },
+    {
+      "id": "cmgtaj6c70047kryvgjcn52su",
+      "dishId": "cmgt7xua30017krw2vklgj4ym",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:42:17.431Z"
+    },
+    {
+      "id": "cmgtajc8u004dkryvp9yt6hdb",
+      "dishId": "cmgt9ob8h000ekryv2mcksm3v",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:42:25.086Z"
+    },
+    {
+      "id": "cmgtb38ob004jkryvlvgzwgzj",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24v5h000fkrh5y7aligif",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb38ob004kkryvoz49za0w",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24v63000ikrh5822sycg9",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb38ob004lkryvqq9bypqu",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24v7y000rkrh5acs4jo1w",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb38ob004mkryvraq0s7n1",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24v8d000tkrh5vs0l8p47",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb38ob004nkryvxhpmrijt",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb38ob004okryv4ejd2uu5",
+      "dishId": "cmgtb38oa004hkryveyuy7a80",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:57:53.578Z"
+    },
+    {
+      "id": "cmgtb5xqn004ukryv3m8k1bhp",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24v55000ekrh5vl8lcscx",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn004vkryv2f5mahlw",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24v5w000hkrh568w8lekd",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn004wkryvks9yrcil",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24v7y000rkrh5acs4jo1w",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn004xkryv0vmjnz7r",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24vbi0016krh5kzg8f06i",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn004ykryvk07v9irr",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn004zkryvkp18c5q4",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtb5xqn0050kryvab3brkw3",
+      "dishId": "cmgtb5xqn004skryvrlt4wjoe",
+      "ingredientId": "cmgt24ved001nkrh58njac02q",
+      "createdAt": "2025-10-16T10:59:59.375Z"
+    },
+    {
+      "id": "cmgtbc5nc005lkryv77oked0f",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24v7y000rkrh5acs4jo1w",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005mkryvi1r2oban",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24vce001akrh5xnpx5mb0",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005nkryvwhynz6vc",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24vct001dkrh52m4qmhjt",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005okryvocyu1yt3",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24vdw001kkrh597gbuf4m",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005pkryv1ij2kemx",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24ve8001mkrh5ptnyhc2k",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    },
+    {
+      "id": "cmgtbc5nc005qkryvoh6bhozi",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs",
+      "ingredientId": "cmgt24ved001nkrh58njac02q",
+      "createdAt": "2025-10-16T11:04:49.560Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "cmgtd7cnt0005kr9cpgeqkaqj",
+      "orderNumber": "ORD-1760615824599-FUD6ZMCZJ",
+      "status": "PREPARING",
+      "totalAmount": "36",
+      "notes": "Ordine di test",
+      "customerInfo": {
+        "name": "Mario Rossi",
+        "phone": "1234567890"
+      },
+      "tableNumber": "5",
+      "kitchenNotes": "Ordine confermato dalla cucina",
+      "estimatedTime": 25,
+      "createdAt": "2025-10-16T11:57:04.601Z",
+      "updatedAt": "2025-10-16T12:01:26.774Z",
+      "restaurantId": "ristorante1-restaurant"
+    }
+  ],
+  "orderItems": [
+    {
+      "id": "cmgtd7cnt0007kr9cevd9cd3e",
+      "quantity": 2,
+      "price": "18",
+      "notes": "Ben cotta",
+      "orderId": "cmgtd7cnt0005kr9cpgeqkaqj",
+      "dishId": "cmgtbc5nc005gkryvz72fh3gs"
+    }
+  ]
+}

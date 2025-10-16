@@ -21,6 +21,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.0.0",
     "@prisma/client": "^6.17.1",
+    "@supabase/supabase-js": "^2.75.0",
     "@types/react-dropzone": "^4.2.2",
     "@upstash/redis": "^1.35.6",
     "bcryptjs": "^3.0.2",
