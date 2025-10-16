@@ -1,24 +1,23 @@
-import NextAuth, { getServerSession } from 'next-auth'
+import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import GoogleProvider from 'next-auth/providers/google'
-import FacebookProvider from 'next-auth/providers/facebook'
-import CredentialsProvider from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+import Facebook from 'next-auth/providers/facebook'
+import Credentials from 'next-auth/providers/credentials'
 import { prisma } from '../db/prisma'
 import bcrypt from 'bcryptjs'
 
-export const authOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    FacebookProvider({
+    Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
     }),
-    CredentialsProvider({
-      name: 'credentials',
+    Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' }
@@ -71,11 +70,6 @@ export const authOptions = {
     signIn: '/auth/signin',
     error: '/auth/error',
   },
-}
+})
 
-const handler = NextAuth(authOptions)
-
-// Export auth function for server components
-export const auth = getServerSession(authOptions)
-
-export { getServerSession, handler as GET, handler as POST }
+export const { GET, POST } = handlers
