@@ -1,0 +1,12 @@
+-- Drop all tables in correct order (respecting foreign key constraints)
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS dish_ingredients CASCADE;
+DROP TABLE IF EXISTS dish_allergens CASCADE;
+DROP TABLE IF EXISTS dishes CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS menus CASCADE;
+DROP TABLE IF EXISTS restaurants CASCADE;
+DROP TABLE IF EXISTS ingredients CASCADE;
+DROP TABLE IF EXISTS allergens CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
