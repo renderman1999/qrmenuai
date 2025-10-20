@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { z } from 'zod'
 
@@ -12,16 +13,15 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { categoryId, newSortOrder } = updateSortOrderSchema.parse(body)
 
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {
@@ -83,16 +83,15 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const { categories } = updateMultipleSortOrderSchema.parse(body)
 
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {

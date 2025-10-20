@@ -1,18 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search, Filter, Heart, Star, X, Minus, Plus } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 import Chatbot from './Chatbot'
 import DishDetailModal from './DishDetailModal'
+import QRScanTracker from './QRScanTracker'
+import MenuLoader from './MenuLoader'
 
 interface MenuDisplayProps {
   menu: any
   restaurant: any
+  qrCodeId?: string
 }
 
-export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
+export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayProps) {
+  // Debug: log dei valori ricevuti
+  console.log('🤖 MenuDisplay debug:', {
+    restaurantId: restaurant?.id,
+    restaurantName: restaurant?.name,
+    ordersEnabled: restaurant?.ordersEnabled,
+    chatbotEnabled: restaurant?.chatbotEnabled
+  })
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Simula il caricamento del menu
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 2000) // 2 secondi di caricamento
+
+    return () => clearTimeout(timer)
+  }, [])
+
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [dietaryFilters, setDietaryFilters] = useState({
@@ -176,53 +198,74 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
     }
   }
 
+  // Mostra il loader durante il caricamento
+  if (isLoading) {
+    return <MenuLoader restaurant={restaurant} />
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navbar con logo del ristorante */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo del ristorante */}
+            <div className="flex items-center space-x-4">
+              {restaurant.logo ? (
+                <img
+                  src={restaurant.logo}
+                  alt={restaurant.name}
+                  className="h-12 w-12 object-contain rounded-lg"
+                />
+              ) : (
+                <div className="h-12 w-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                </div>
+              )}
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{restaurant.name}</h1>
+                <p className="text-sm text-gray-600">{menu.name}</p>
+              </div>
+            </div>
+
+            {/* Carrello - solo se ordini abilitati */}
+            {restaurant.ordersEnabled && (
+              <button 
+                onClick={() => setShowOrderForm(true)}
+                className="p-2 hover:bg-gray-100 rounded-lg relative"
+              >
+                <FontAwesomeIcon icon={faShoppingCart} className="w-6 h-6" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      </nav>
+
       {/* Header con ricerca */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            
-            <div className="flex-1 max-w-md mx-4">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-center">
+            <div className="flex-1 max-w-md">
               <div className="relative">
                 <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-            <input
-              type="text"
-                  placeholder="Cerca..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+                <input
+                  type="text"
+                  placeholder="Cerca nel menu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
                 />
               </div>
             </div>
-            
-            <button 
-              onClick={() => setShowOrderForm(true)}
-              className="p-2 hover:bg-gray-100 rounded-lg relative"
-            >
-              <FontAwesomeIcon icon={faShoppingCart} className="w-6 h-6" />
-              {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {getTotalItems()}
-                </span>
-              )}
-            </button>
-          </div>
-          
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {restaurant.name}
-            </h1>
-            <h2 className="text-xl text-gray-700">
-              {menu.name}
-            </h2>
           </div>
         </div>
       </div>
@@ -364,10 +407,10 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
                               {dish.name}
                             </h4>
                             <div className="flex gap-1">
-                                {dish.isVegetarian && <span className="text-green-600 text-sm">🌱</span>}
-                                {dish.isVegan && <span className="text-green-600 text-sm">🌿</span>}
-                                {dish.isGlutenFree && <span className="text-blue-600 text-sm">🌾</span>}
-                                {dish.isSpicy && <span className="text-red-600 text-sm">🌶️</span>}
+                                {dish.isVegetarian && <span className="text-green-600 text-xl">🌱</span>}
+                                {dish.isVegan && <span className="text-green-600 text-xl">🌿</span>}
+                                {dish.isGlutenFree && <span className="text-blue-600 text-lg">🌾</span>}
+                                {dish.isSpicy && <span className="text-red-600 text-lg">🌶️</span>}
                               </div>
                           </div>
                           
@@ -431,20 +474,25 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
           })}
       </div>
 
-      {/* Footer */}
-      <div className="text-center mt-12 py-8 border-t border-gray-200">
-        <p className="text-gray-600">
-          Powered by QR Menu AI
-        </p>
-      </div>
+    
 
       {/* Chatbot */}
-      <Chatbot 
-        restaurantId={restaurant.id}
-        menuId={menu.id}
-        dishes={menu.categories.flatMap((category: any) => category.dishes)}
-        onAddToCart={addToCart}
-      />
+      {(() => {
+        console.log('🤖 Chatbot check:', {
+          chatbotEnabled: restaurant.chatbotEnabled,
+          restaurantId: restaurant.id,
+          menuId: menu.id
+        })
+        return restaurant.chatbotEnabled && (
+          <Chatbot 
+            restaurantId={restaurant.id}
+            menuId={menu.id}
+            dishes={menu.categories.flatMap((category: any) => category.dishes)}
+            onAddToCart={addToCart}
+            ordersEnabled={restaurant.ordersEnabled}
+          />
+        )
+      })()}
 
       {/* Modal dettaglio piatto */}
       <DishDetailModal
@@ -452,10 +500,11 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
         onClose={handleCloseModal}
         dish={selectedDish}
         onAddToCart={addToCart}
+        ordersEnabled={restaurant.ordersEnabled}
       />
 
-      {/* Modal carrello */}
-      {isCartOpen && (
+      {/* Modal carrello - solo se ordini abilitati */}
+      {isCartOpen && restaurant.ordersEnabled && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
           <div 
@@ -547,8 +596,8 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
         </div>
       )}
 
-      {/* Order Form Modal */}
-      {showOrderForm && (
+      {/* Order Form Modal - solo se ordini abilitati */}
+      {showOrderForm && restaurant.ordersEnabled && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Backdrop */}
           <div 
@@ -663,6 +712,149 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
         </div>
       )}
 
+      {/* Legenda Caratteristiche Dietetiche */}
+      <div className="bg-gray-50 border-t border-gray-200 py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Etichette Alimentari</h3>
+          <div className="flex flex-wrap justify-center gap-6">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🌱</span>
+              <span className="text-sm text-gray-700">Vegetariano</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🌿</span>
+              <span className="text-sm text-gray-700">Vegano</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🌾</span>
+              <span className="text-sm text-gray-700">Senza Glutine</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">🌶️</span>
+              <span className="text-sm text-gray-700">Piccante</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Informazioni Ristorante */}
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                {restaurant.logo ? (
+                  <img
+                    src={restaurant.logo}
+                    alt={restaurant.name}
+                    className="h-10 w-10 object-contain rounded-lg"
+                  />
+                ) : (
+                  <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center">
+                    <svg className="h-5 w-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                )}
+                <h3 className="text-xl font-bold">{restaurant.name}</h3>
+              </div>
+              {restaurant.description && (
+                <p className="text-gray-300 mb-4">{restaurant.description}</p>
+              )}
+              <div className="space-y-2">
+                {restaurant.address && (
+                  <div className="flex items-center space-x-2">
+                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-sm text-gray-300">{restaurant.address}</span>
+                  </div>
+                )}
+                {restaurant.phone && (
+                  <div className="flex items-center space-x-2">
+                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                    <span className="text-sm text-gray-300">{restaurant.phone}</span>
+                  </div>
+                )}
+                {restaurant.email && (
+                  <div className="flex items-center space-x-2">
+                    <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-sm text-gray-300">{restaurant.email}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Menu */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Menu</h4>
+              <div className="space-y-2">
+                {menu.categories.map((category: any) => (
+                  <div key={category.id} className="text-sm text-gray-300">
+                    {category.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Social Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Seguici</h4>
+              <div className="flex space-x-4">
+                {restaurant.socialLinks?.facebook && (
+                  <a
+                    href={restaurant.socialLinks.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                )}
+                {restaurant.socialLinks?.instagram && (
+                  <a
+                    href={restaurant.socialLinks.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.718-1.297c-.875.807-2.026 1.297-3.323 1.297s-2.448-.49-3.323-1.297c-.807-.875-1.297-2.026-1.297-3.323s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323z"/>
+                    </svg>
+                  </a>
+                )}
+                {restaurant.socialLinks?.twitter && (
+                  <a
+                    href={restaurant.socialLinks.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p className="text-gray-400 text-sm">
+              © 2024 {restaurant.name}. Tutti i diritti riservati.
+            </p>
+          </div>
+        </div>
+      </footer>
+
       {/* Notifica */}
       {showNotification && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-in slide-in-from-right duration-300">
@@ -670,6 +862,9 @@ export default function MenuDisplay({ menu, restaurant }: MenuDisplayProps) {
           <span className="font-medium">{notificationMessage}</span>
         </div>
       )}
+      
+      {/* QR Scan Tracker */}
+      {qrCodeId && <QRScanTracker qrCodeId={qrCodeId} />}
     </div>
   )
 }

@@ -1,8 +1,125 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { invalidateMenuCache, invalidateRestaurantCache } from '@/lib/cache/menu-cache'
 import { z } from 'zod'
 import { Decimal } from '@prisma/client/runtime/library'
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateDishRequest:
+ *       type: object
+ *       required:
+ *         - name
+ *         - price
+ *         - categoryId
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Nome del piatto
+ *         description:
+ *           type: string
+ *           description: Descrizione del piatto
+ *         price:
+ *           type: number
+ *           minimum: 0
+ *           description: Prezzo del piatto
+ *         categoryId:
+ *           type: string
+ *           description: ID della categoria
+ *         allergenIds:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista degli ID degli allergeni
+ *         ingredientIds:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista degli ID degli ingredienti
+ *         isVegetarian:
+ *           type: boolean
+ *           description: Se il piatto è vegetariano
+ *         isVegan:
+ *           type: boolean
+ *           description: Se il piatto è vegano
+ *         isGlutenFree:
+ *           type: boolean
+ *           description: Se il piatto è senza glutine
+ *         isSpicy:
+ *           type: boolean
+ *           description: Se il piatto è piccante
+ *         image:
+ *           type: string
+ *           description: URL dell'immagine del piatto
+ *         galleryEnabled:
+ *           type: boolean
+ *           description: Se la galleria immagini è abilitata
+ *         galleryImages:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               url:
+ *                 type: string
+ *               alt:
+ *                 type: string
+ *               order:
+ *                 type: number
+ *           description: Immagini della galleria
+ *     Dish:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         description:
+ *           type: string
+ *         price:
+ *           type: number
+ *           format: decimal
+ *         categoryId:
+ *           type: string
+ *         menuId:
+ *           type: string
+ *         isVegetarian:
+ *           type: boolean
+ *         isVegan:
+ *           type: boolean
+ *         isGlutenFree:
+ *           type: boolean
+ *         isSpicy:
+ *           type: boolean
+ *         image:
+ *           type: string
+ *         galleryEnabled:
+ *           type: boolean
+ *         galleryImages:
+ *           type: array
+ *           items:
+ *             type: object
+ *         sortOrder:
+ *           type: number
+ *         isActive:
+ *           type: boolean
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *         dishAllergens:
+ *           type: array
+ *           items:
+ *             type: object
+ *         dishIngredients:
+ *           type: array
+ *           items:
+ *             type: object
+ */
 
 const createDishSchema = z.object({
   name: z.string().min(1, 'Nome piatto richiesto'),
@@ -24,6 +141,62 @@ const createDishSchema = z.object({
   })).optional(),
 })
 
+/**
+ * @swagger
+ * /api/dishes:
+ *   post:
+ *     summary: Crea un nuovo piatto
+ *     description: Crea un nuovo piatto con allergeni e ingredienti associati
+ *     tags: [Dishes]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateDishRequest'
+ *     responses:
+ *       200:
+ *         description: Piatto creato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dish:
+ *                   $ref: '#/components/schemas/Dish'
+ *       400:
+ *         description: Dati non validi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Non autorizzato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Non autorizzato per questa categoria
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Utente o categoria non trovata
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(request: NextRequest) {
   try {
     console.log('POST /api/dishes called')
@@ -36,16 +209,15 @@ export async function POST(request: NextRequest) {
     const data = createDishSchema.parse(body)
     console.log('Validated dish data:', data)
 
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {
@@ -159,10 +331,50 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * @swagger
+ * /api/dishes:
+ *   get:
+ *     summary: Recupera i piatti di una categoria
+ *     description: Recupera tutti i piatti attivi di una categoria specifica
+ *     tags: [Dishes]
+ *     parameters:
+ *       - in: query
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID della categoria
+ *     responses:
+ *       200:
+ *         description: Lista dei piatti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dishes:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Dish'
+ *       400:
+ *         description: Category ID richiesto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const categoryId = searchParams.get('categoryId')
+    const includeInactive = searchParams.get('includeInactive') === 'true'
 
     if (!categoryId) {
       return NextResponse.json({ error: 'Category ID richiesto' }, { status: 400 })
@@ -171,7 +383,7 @@ export async function GET(request: NextRequest) {
     const dishes = await prisma.dish.findMany({
       where: {
         categoryId: categoryId,
-        isActive: true
+        ...(includeInactive ? {} : { isActive: true })
       },
       include: {
         dishAllergens: {

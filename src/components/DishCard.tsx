@@ -7,9 +7,10 @@ interface DishCardProps {
   dish: any
   onView: (dish: any) => void
   onAddToOrder: (dish: any, quantity: number) => void
+  ordersEnabled?: boolean
 }
 
-export default function DishCard({ dish, onView, onAddToOrder }: DishCardProps) {
+export default function DishCard({ dish, onView, onAddToOrder, ordersEnabled = true }: DishCardProps) {
   const [quantity, setQuantity] = useState(1)
 
   const handleQuantityChange = (change: number) => {
@@ -76,27 +77,29 @@ export default function DishCard({ dish, onView, onAddToOrder }: DishCardProps) 
           </div>
         </div>
 
-        {/* Selettore quantità */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Quantità:</span>
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={() => handleQuantityChange(-1)}
-                className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-              >
-                <span className="text-sm">-</span>
-              </button>
-              <span className="w-8 text-center text-sm font-medium">{quantity}</span>
-              <button
-                onClick={() => handleQuantityChange(1)}
-                className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-              >
-                <span className="text-sm">+</span>
-              </button>
+        {/* Selettore quantità - solo se ordini abilitati */}
+        {ordersEnabled && (
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">Quantità:</span>
+              <div className="flex items-center space-x-1">
+                <button
+                  onClick={() => handleQuantityChange(-1)}
+                  className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                >
+                  <span className="text-sm">-</span>
+                </button>
+                <span className="w-8 text-center text-sm font-medium">{quantity}</span>
+                <button
+                  onClick={() => handleQuantityChange(1)}
+                  className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                >
+                  <span className="text-sm">+</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Pulsanti azione */}
         <div className="flex space-x-2">
@@ -107,13 +110,15 @@ export default function DishCard({ dish, onView, onAddToOrder }: DishCardProps) 
             <Eye size={12} className="mr-1" />
             Vedi
           </button>
-          <button
-            onClick={handleAddToOrder}
-            className="flex-1 flex items-center justify-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            <ShoppingCart size={12} className="mr-1" />
-            Aggiungi all'ordine
-          </button>
+          {ordersEnabled && (
+            <button
+              onClick={handleAddToOrder}
+              className="flex-1 flex items-center justify-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <ShoppingCart size={12} className="mr-1" />
+              Aggiungi all'ordine
+            </button>
+          )}
         </div>
       </div>
     </div>

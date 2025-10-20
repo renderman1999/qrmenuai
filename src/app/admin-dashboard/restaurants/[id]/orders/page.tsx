@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { ArrowLeft, ChefHat, Clock, TrendingUp } from 'lucide-react'
 import KitchenOrders from '@/components/admin/KitchenOrders'
 
@@ -12,26 +13,25 @@ interface OrdersPageProps {
 }
 
 export default function OrdersPage({ params }: OrdersPageProps) {
+  const { data: session, status } = useSession()
   const { id: restaurantId } = use(params)
-  const [user, setUser] = useState<any>(null)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('adminLoggedIn')
-    const userData = localStorage.getItem('adminUser')
-
-    if (!isLoggedIn || !userData) {
+    if (status === 'loading') return
+    
+    if (status === 'unauthenticated') {
       router.push('/admin-login')
       return
     }
-
-    const userObj = JSON.parse(userData)
-    setUser(userObj)
-    loadRestaurantData(restaurantId, userObj.email)
-    setIsLoading(false)
-  }, [router, restaurantId])
+    
+    if (session?.user?.email) {
+      loadRestaurantData(restaurantId, session.user.email)
+      setIsLoading(false)
+    }
+  }, [session, status, router, restaurantId])
 
   const loadRestaurantData = async (restId: string, userEmail: string) => {
     try {
@@ -46,6 +46,18 @@ export default function OrdersPage({ params }: OrdersPageProps) {
     } catch (error) {
       console.error('Error loading restaurant:', error)
     }
+  }
+
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return null // Il redirect è gestito nel useEffect
   }
 
   if (isLoading) {
@@ -63,10 +75,10 @@ export default function OrdersPage({ params }: OrdersPageProps) {
         <div className="mb-8">
           <button
             onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}`)}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+            className="cursor-pointer flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
-            Torna al Ristorante
+            Torna all'attività
           </button>
           
           <div className="flex items-center justify-between">

@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { X, Save, Loader2, Image as ImageIcon, Images } from 'lucide-react'
 import ImageDropzone from './ImageDropzone'
 import ImageGallery from './ImageGallery'
 import DishGalleryManager from './DishGalleryManager'
+import AdditionalInfoManager, { AdditionalInfoSection } from './AdditionalInfoManager'
 
 interface DishFormModalProps {
   isOpen: boolean
@@ -26,6 +28,9 @@ interface DishFormModalProps {
     image: string | null
     galleryEnabled?: boolean
     galleryImages?: Array<{url: string, alt?: string, order: number}>
+    additionalInfo?: {
+      sections: AdditionalInfoSection[]
+    }
   } | null
 }
 
@@ -38,6 +43,7 @@ export default function DishFormModal({
   restaurantId,
   dish
 }: DishFormModalProps) {
+  const { data: session } = useSession()
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -50,7 +56,10 @@ export default function DishFormModal({
     isSpicy: false,
     image: '',
     galleryEnabled: false,
-    galleryImages: [] as Array<{url: string, alt?: string, order: number}>
+    galleryImages: [] as Array<{url: string, alt?: string, order: number}>,
+    additionalInfo: {
+      sections: [] as AdditionalInfoSection[]
+    }
   })
   const [availableAllergens, setAvailableAllergens] = useState<any[]>([])
   const [availableIngredients, setAvailableIngredients] = useState<any[]>([])
@@ -76,7 +85,8 @@ export default function DishFormModal({
           isSpicy: dish.isSpicy,
           image: dish.image || '',
           galleryEnabled: dish.galleryEnabled || false,
-          galleryImages: dish.galleryImages || []
+          galleryImages: dish.galleryImages || [],
+          additionalInfo: dish.additionalInfo || { sections: [] }
         })
       } else {
         setFormData({
@@ -91,7 +101,8 @@ export default function DishFormModal({
           isSpicy: false,
           image: '',
           galleryEnabled: false,
-          galleryImages: []
+          galleryImages: [],
+          additionalInfo: { sections: [] }
         })
       }
       setError('')
@@ -171,13 +182,10 @@ export default function DishFormModal({
     setError('')
 
     try {
-      const userEmail = localStorage.getItem('adminUser')
-      if (!userEmail) {
-        setError('Utente non trovato')
+      if (!session?.user?.email) {
+        setError('Sessione scaduta. Effettua nuovamente il login.')
         return
       }
-
-      const user = JSON.parse(userEmail)
 
       const url = dish ? `/api/dishes/${dish.id}` : '/api/dishes'
       const method = dish ? 'PUT' : 'POST'
@@ -213,7 +221,8 @@ export default function DishFormModal({
         isSpicy: formData.isSpicy || false,
         image: formData.image || null,
         galleryEnabled: formData.galleryEnabled || false,
-        galleryImages: formData.galleryImages || []
+        galleryImages: formData.galleryImages || [],
+        additionalInfo: formData.additionalInfo || { sections: [] }
       } : {
         // Per creazione nuovo piatto
         name: formData.name.trim(),
@@ -228,16 +237,17 @@ export default function DishFormModal({
         isSpicy: formData.isSpicy || false,
         image: formData.image || null,
         galleryEnabled: formData.galleryEnabled || false,
-        galleryImages: formData.galleryImages || []
+        galleryImages: formData.galleryImages || [],
+        additionalInfo: formData.additionalInfo || { sections: [] }
       }
 
       console.log('Sending dish data:', requestData)
+      console.log('Additional info being sent:', formData.additionalInfo)
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestData)
       })
@@ -601,6 +611,21 @@ export default function DishFormModal({
             />
           </div>
 
+          {/* Informazioni Aggiuntive */}
+          <div className="border-t pt-6">
+            <AdditionalInfoManager
+              sections={formData.additionalInfo.sections}
+              onChange={(sections) => {
+                setFormData(prev => ({
+                  ...prev,
+                  additionalInfo: {
+                    sections: sections
+                  }
+                }))
+              }}
+            />
+          </div>
+
           {error && (
             <div className="text-red-600 text-sm">
               {error}
@@ -611,7 +636,7 @@ export default function DishFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+              className="cursor-pointer px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
               disabled={isSaving}
             >
               Annulla
@@ -619,7 +644,7 @@ export default function DishFormModal({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
+              className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
             >
               {isSaving ? (
                 <>

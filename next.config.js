@@ -1,22 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Disable ESLint during builds to allow deployment
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // Disable TypeScript errors during builds
-    ignoreBuildErrors: true,
-  },
-  images: {
-    domains: ['localhost', 'qrbooking.cloud'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-    ],
-  },
+  serverExternalPackages: ['@prisma/client'],
+  // Imposta la porta predefinita a 3000
+  env: {
+    PORT: '3000'
+  }
 }
 
 module.exports = nextConfig

@@ -1,0 +1,104 @@
+/* Swagger UI Styles */
+@import 'swagger-ui-react/swagger-ui.css';
+
+/* Custom styles for better integration */
+.swagger-ui-container {
+  width: 100%;
+  min-height: 600px;
+}
+
+.swagger-ui .topbar {
+  display: none;
+}
+
+.swagger-ui .info {
+  margin: 20px 0;
+}
+
+.swagger-ui .info .title {
+  font-size: 2rem;
+  color: #3b82f6;
+}
+
+.swagger-ui .scheme-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.swagger-ui .opblock {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin: 10px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.swagger-ui .opblock.opblock-get {
+  border-left: 4px solid #10b981;
+}
+
+.swagger-ui .opblock.opblock-post {
+  border-left: 4px solid #3b82f6;
+}
+
+.swagger-ui .opblock.opblock-put {
+  border-left: 4px solid #f59e0b;
+}
+
+.swagger-ui .opblock.opblock-delete {
+  border-left: 4px solid #ef4444;
+}
+
+.swagger-ui .opblock-summary {
+  padding: 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.swagger-ui .opblock-description-wrapper {
+  padding: 16px;
+}
+
+.swagger-ui .btn {
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.swagger-ui .btn:hover {
+  background: #2563eb;
+}
+
+.swagger-ui .btn.execute {
+  background: #10b981;
+}
+
+.swagger-ui .btn.execute:hover {
+  background: #059669;
+}
+
+.swagger-ui .response-col_status {
+  font-weight: 600;
+}
+
+.swagger-ui .response-col_status-200 {
+  color: #10b981;
+}
+
+.swagger-ui .response-col_status-400,
+.swagger-ui .response-col_status-401,
+.swagger-ui .response-col_status-403,
+.swagger-ui .response-col_status-404 {
+  color: #f59e0b;
+}
+
+.swagger-ui .response-col_status-500 {
+  color: #ef4444;
+}

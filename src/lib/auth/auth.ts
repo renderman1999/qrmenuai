@@ -37,8 +37,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null
         }
 
-        // For demo purposes, we'll skip password verification
-        // In production, you should hash and compare passwords
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
+        
+        if (!isPasswordValid) {
+          return null
+        }
         return {
           id: user.id,
           email: user.email,
@@ -67,8 +70,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    signIn: '/auth/signin',
-    error: '/auth/error',
+    signIn: '/admin-login',
+    error: '/admin-login',
   },
 })
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Minus, Plus } from 'lucide-react'
+import { X, Minus, Plus, ChevronDown, ChevronUp, Type, Video, Youtube } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 
@@ -10,15 +10,18 @@ interface DishDetailModalProps {
   onClose: () => void
   dish: any
   onAddToCart?: (dish: any, quantity: number) => void
+  ordersEnabled?: boolean
 }
 
-export default function DishDetailModal({ isOpen, onClose, dish, onAddToCart }: DishDetailModalProps) {
+export default function DishDetailModal({ isOpen, onClose, dish, onAddToCart, ordersEnabled = true }: DishDetailModalProps) {
   const [quantity, setQuantity] = useState(0)
+  const [isAdditionalInfoOpen, setIsAdditionalInfoOpen] = useState(false)
 
-  // Reset quantità quando il modal si apre
+  // Reset quantità e stato accordion quando il modal si apre
   useEffect(() => {
     if (isOpen) {
       setQuantity(0)
+      setIsAdditionalInfoOpen(false)
     }
   }, [isOpen])
 
@@ -86,28 +89,36 @@ export default function DishDetailModal({ isOpen, onClose, dish, onAddToCart }: 
             )}
             
             <div className="flex-1 ml-4">
-              <div className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
-                <span className="text-lg font-semibold">
-                  €{dish.price}
-                </span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleQuantityChange(-1)}
-                    className="cursor-pointer w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900 transition-colors"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <span className="text-lg font-semibold min-w-[20px] text-center">
-                    {quantity}
+              {ordersEnabled ? (
+                <div className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
+                  <span className="text-lg font-semibold">
+                    €{dish.price}
                   </span>
-                  <button
-                    onClick={() => handleQuantityChange(1)}
-                    className="w-6 cursor-pointer h-6 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900 transition-colors"
-                  >
-                    <Plus size={14} />
-                  </button>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleQuantityChange(-1)}
+                      className="cursor-pointer w-6 h-6 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900 transition-colors"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="text-lg font-semibold min-w-[20px] text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => handleQuantityChange(1)}
+                      className="w-6 cursor-pointer h-6 rounded-full bg-gray-800 text-white flex items-center justify-center hover:bg-gray-900 transition-colors"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-orange-500 text-white px-4 py-2 rounded-lg">
+                  <span className="text-lg font-semibold">
+                    €{dish.price}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -211,24 +222,100 @@ export default function DishDetailModal({ isOpen, onClose, dish, onAddToCart }: 
               </div>
             </div>
           )}
+
+          {/* Informazioni Aggiuntive */}
+          {dish.additionalInfo && dish.additionalInfo.sections && dish.additionalInfo.sections.length > 0 && (
+            <div className="mb-6">
+              <button
+                onClick={() => setIsAdditionalInfoOpen(!isAdditionalInfoOpen)}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <span className="text-lg font-semibold text-gray-900">
+                  Vuoi sapere di più?
+                </span>
+                {isAdditionalInfoOpen ? (
+                  <ChevronUp className="h-5 w-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-gray-600" />
+                )}
+              </button>
+              
+              {isAdditionalInfoOpen && (
+                <div className="mt-4 space-y-4">
+                  {dish.additionalInfo.sections
+                    .sort((a: any, b: any) => a.order - b.order)
+                    .map((section: any, index: number) => (
+                    <div key={section.id || index} className="border border-gray-200 rounded-lg p-4 bg-white">
+                      <div className="flex items-center mb-3">
+                        {section.type === 'text' && <Type className="h-5 w-5 text-blue-600 mr-2" />}
+                        {section.type === 'video' && <Video className="h-5 w-5 text-green-600 mr-2" />}
+                        {section.type === 'youtube' && <Youtube className="h-5 w-5 text-red-600 mr-2" />}
+                        <h4 className="text-lg font-semibold text-gray-900">
+                          {section.title}
+                        </h4>
+                      </div>
+                      
+                      {section.type === 'text' && section.content && (
+                        <div 
+                          className="prose prose-sm max-w-none text-gray-700"
+                          dangerouslySetInnerHTML={{ __html: section.content }}
+                        />
+                      )}
+                      
+                      {section.type === 'video' && section.videoFile && (
+                        <div className="space-y-2">
+                          <video 
+                            controls 
+                            className="w-full rounded-lg"
+                            src={section.videoFile}
+                          >
+                            Il tuo browser non supporta il tag video.
+                          </video>
+                        </div>
+                      )}
+                      
+                      {section.type === 'youtube' && section.youtubeId && (
+                        <div className="space-y-2">
+                          <div className="aspect-video rounded-lg overflow-hidden">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={`https://www.youtube.com/embed/${section.youtubeId}`}
+                              title={section.title || 'Video YouTube'}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           </div>
         </div>
 
-        {/* Footer con pulsante carrello */}
-        <div className="p-6 border-t bg-gray-50 flex-shrink-0">
-          <button
-            onClick={handleAddToCart}
-            disabled={quantity === 0}
-            className={`cursor-pointer w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center transition-colors ${
-              quantity > 0 
-                ? 'bg-gray-800 hover:bg-gray-900' 
-                : 'bg-gray-300 cursor-not-allowed'
-            }`}
-          >
-            <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5 mr-2" />
-            Aggiungi all'ordine
-          </button>
-        </div>
+        {/* Footer con pulsante carrello - solo se ordini abilitati */}
+        {ordersEnabled && (
+          <div className="p-6 border-t bg-gray-50 flex-shrink-0">
+            <button
+              onClick={handleAddToCart}
+              disabled={quantity === 0}
+              className={`cursor-pointer w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center transition-colors ${
+                quantity > 0 
+                  ? 'bg-gray-800 hover:bg-gray-900' 
+                  : 'bg-gray-300 cursor-not-allowed'
+              }`}
+            >
+              <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5 mr-2" />
+              Aggiungi all'ordine
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

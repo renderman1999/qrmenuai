@@ -289,7 +289,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="text-2xl font-bold mb-4">🍽️ QR Menu AI</div>
           <p className="text-gray-400 mb-6">
-            La tecnologia più avanzata per il tuo ristorante
+            Tecnologia innovativa per la ristorazione digitale
           </p>
           <div className="flex justify-center space-x-6">
             <a href="/menu/RISTORANTE1" className="text-gray-400 hover:text-white transition-colors">Demo</a>

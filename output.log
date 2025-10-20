@@ -1,0 +1,41 @@
+nohup: ignoring input
+
+> qrmenu-new@0.1.0 dev
+> next dev -p 3000
+
+   ▲ Next.js 15.5.5
+   - Local:        http://localhost:3000
+   - Network:      http://2.58.82.226:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 12.6s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 742ms (189 modules)
+ ○ Compiling /menu/[qrCode] ...
+ ✓ Compiled /menu/[qrCode] in 3.9s (808 modules)
+✅ Using direct database field for ordersEnabled: true
+✅ Using direct database field for chatbotEnabled: false
+🔍 Restaurant debug: {
+  id: 'cmguzenpq000dkr9cjnk329t5',
+  name: 'Dù Spaghi',
+  ordersEnabled: true,
+  chatbotEnabled: false,
+  socialLinks: { ordersEnabled: false, chatbotEnabled: false },
+  hasSocialLinks: true
+}
+🤖 MenuDisplay debug: {
+  restaurantId: 'cmguzenpq000dkr9cjnk329t5',
+  restaurantName: 'Dù Spaghi',
+  ordersEnabled: true,
+  chatbotEnabled: false
+}
+ GET /menu/d-spaghi?menuId=cmguzhho7000fkr9cezdyvxxa 200 in 7545ms
+ ⚠ Cross origin request detected from 2.58.82.226 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1019ms (507 modules)
+ ✓ Compiled in 820ms (319 modules)
+ GET /favicon.ico 200 in 2857ms
+ GET /api/auth/session 200 in 3581ms
+ GET /api/auth/session 200 in 75ms

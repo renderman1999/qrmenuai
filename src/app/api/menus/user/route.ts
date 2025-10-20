@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 
 export async function GET(request: NextRequest) {
   try {
-        // Leggi l'email dell'utente dall'header della richiesta
-        const userEmail = request.headers.get('x-user-email')
+        const session = await auth()
         
-        if (!userEmail) {
-          return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+        if (!session?.user?.email) {
+          return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
         }
         
         // Cerchiamo l'utente nel database
         const targetUser = await prisma.user.findUnique({
-          where: { email: userEmail }
+          where: { email: session.user.email }
         })
         
         if (!targetUser) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import ImageDropzone from '@/components/admin/ImageDropzone'
@@ -14,13 +15,18 @@ interface Restaurant {
   phone: string | null
   email: string | null
   website: string | null
+  instagram: string | null
+  facebook: string | null
+  whatsapp: string | null
   image: string | null
+  coverImage: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
 }
 
 export default function EditRestaurantPage() {
+  const { data: session, status } = useSession()
   const params = useParams()
   const router = useRouter()
   const restaurantId = params.id as string
@@ -38,6 +44,9 @@ export default function EditRestaurantPage() {
     phone: '',
     email: '',
     website: '',
+    instagram: '',
+    facebook: '',
+    whatsapp: '',
     logo: '',
     coverImage: '',
     isActive: true
@@ -47,24 +56,18 @@ export default function EditRestaurantPage() {
   useEffect(() => {
     const fetchRestaurant = async () => {
       try {
-        setLoading(true)
+        if (status === 'loading') return
         
-        // Check if user is logged in
-        const isLoggedIn = localStorage.getItem('adminLoggedIn')
-        const userData = localStorage.getItem('adminUser')
-        
-        if (!isLoggedIn || !userData) {
+        if (status === 'unauthenticated') {
           router.push('/admin-login')
           return
         }
         
-        const user = JSON.parse(userData)
+        if (!session?.user?.email) return
         
-        const response = await fetch(`/api/restaurants/${restaurantId}`, {
-          headers: {
-            'x-user-email': user.email
-          }
-        })
+        setLoading(true)
+        
+        const response = await fetch(`/api/restaurants/${restaurantId}`)
         
         if (!response.ok) {
           throw new Error('Errore nel caricamento del ristorante')
@@ -81,6 +84,9 @@ export default function EditRestaurantPage() {
           phone: data.phone || '',
           email: data.email || '',
           website: data.website || '',
+          instagram: data.instagram || '',
+          facebook: data.facebook || '',
+          whatsapp: data.whatsapp || '',
           logo: data.logo || '',
           coverImage: data.coverImage || '',
           isActive: data.isActive ?? true
@@ -121,20 +127,16 @@ export default function EditRestaurantPage() {
       setError(null)
       setSuccess(null)
 
-      // Get user data for authentication
-      const userData = localStorage.getItem('adminUser')
-      if (!userData) {
+      // Check if user is authenticated with NextAuth
+      if (!session?.user?.email) {
         setError('Sessione scaduta. Effettua nuovamente il login.')
         return
       }
-      
-      const user = JSON.parse(userData)
 
       const response = await fetch(`/api/restaurants/${restaurantId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData),
       })
@@ -158,12 +160,27 @@ export default function EditRestaurantPage() {
     }
   }
 
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <FontAwesomeIcon icon={faSpinner} className="h-8 w-8 animate-spin text-blue-600 mb-4" />
+          <p className="text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return null // Il redirect è gestito nel useEffect
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <FontAwesomeIcon icon={faSpinner} className="h-8 w-8 animate-spin text-blue-600 mb-4" />
-          <p className="text-gray-600">Caricamento ristorante...</p>
+          <p className="text-gray-600">Caricamento attività...</p>
         </div>
       </div>
     )
@@ -173,10 +190,10 @@ export default function EditRestaurantPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Ristorante non trovato</p>
+          <p className="text-red-600 mb-4">Attività non trovata</p>
           <button
             onClick={() => router.push('/admin-dashboard/restaurants')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Torna alla lista
           </button>
@@ -193,13 +210,13 @@ export default function EditRestaurantPage() {
           <div className="flex items-center mb-4">
             <button
               onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}`)}
-              className="mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md transition-colors"
+              className="cursor-pointer mr-4 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-md transition-colors"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="h-5 w-5" />
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Modifica Ristorante</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Modifica Attività</h1>
           </div>
-          <p className="text-gray-600">Aggiorna le informazioni del ristorante</p>
+          <p className="text-gray-600">Aggiorna le informazioni dell'attività</p>
         </div>
 
         {/* Form */}
@@ -208,7 +225,7 @@ export default function EditRestaurantPage() {
             {/* Nome */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Nome Ristorante *
+                Nome Attività *
               </label>
               <input
                 type="text"
@@ -241,10 +258,11 @@ export default function EditRestaurantPage() {
             {/* Logo */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Logo del Ristorante
+                Logo attività
               </label>
               <ImageDropzone
                 onImageUpload={(imageUrl) => handleImageUpload(imageUrl, 'logo')}
+                onImagesUpload={(imageUrls) => handleImageUpload(imageUrls[0].imageUrl, 'logo')}
                 currentImage={formData.logo}
                 userType="restaurant"
                 userId={restaurantId}
@@ -259,6 +277,7 @@ export default function EditRestaurantPage() {
               </label>
               <ImageDropzone
                 onImageUpload={(imageUrl) => handleImageUpload(imageUrl, 'coverImage')}
+                onImagesUpload={(imageUrls) => handleImageUpload(imageUrls[0].imageUrl, 'coverImage')}
                 currentImage={formData.coverImage}
                 userType="restaurant"
                 userId={restaurantId}
@@ -330,6 +349,58 @@ export default function EditRestaurantPage() {
               />
             </div>
 
+            {/* Social Links */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-2">
+                  Instagram
+                </label>
+                <input
+                  type="url"
+                  id="instagram"
+                  name="instagram"
+                  value={formData.instagram}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://instagram.com/ristorante"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="facebook" className="block text-sm font-medium text-gray-700 mb-2">
+                  Facebook
+                </label>
+                <input
+                  type="url"
+                  id="facebook"
+                  name="facebook"
+                  value={formData.facebook}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://facebook.com/ristorante"
+                />
+              </div>
+            </div>
+
+            {/* WhatsApp */}
+            <div>
+              <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-2">
+                WhatsApp
+              </label>
+              <input
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                value={formData.whatsapp}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="+39 123 456 7890"
+              />
+              <p className="mt-1 text-sm text-gray-500">
+                Inserisci il numero di telefono WhatsApp (es. +39 123 456 7890)
+              </p>
+            </div>
+
             {/* Stato Attivo */}
             <div className="flex items-center">
               <input
@@ -363,14 +434,14 @@ export default function EditRestaurantPage() {
               <button
                 type="button"
                 onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}`)}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                className="cursor-pointer px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
               >
                 Annulla
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                className="cursor-pointer px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
               >
                 {saving ? (
                   <>

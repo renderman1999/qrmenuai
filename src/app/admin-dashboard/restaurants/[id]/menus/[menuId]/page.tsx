@@ -2,12 +2,14 @@
 
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Plus, Edit, Trash2, Eye, QrCode, Save } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { ArrowLeft, Plus, Edit, Trash2, Eye, QrCode, Save, BarChart3 } from 'lucide-react'
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal'
 import AddCategoriesModal from '@/components/admin/AddCategoriesModal'
 import SortableCategories from '@/components/admin/SortableCategories'
 import EditMenuModal from '@/components/admin/EditMenuModal'
 import QRCodeGenerator from '@/components/admin/QRCodeGenerator'
+import MenuCoverImageUpload from '@/components/admin/MenuCoverImageUpload'
 
 interface MenuManagementPageProps {
   params: Promise<{
@@ -17,8 +19,8 @@ interface MenuManagementPageProps {
 }
 
 export default function MenuManagementPage({ params }: MenuManagementPageProps) {
+  const { data: session, status } = useSession()
   const { id: restaurantId, menuId } = use(params)
-  const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [menu, setMenu] = useState<any>(null)
@@ -31,31 +33,28 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
   const [isSavingOrder, setIsSavingOrder] = useState(false)
   const [isSavingMenu, setIsSavingMenu] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState<string | null>(null)
+  const [menuCoverImage, setMenuCoverImage] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('adminLoggedIn')
-    const userData = localStorage.getItem('adminUser')
-
-    if (!isLoggedIn || !userData) {
+    if (status === 'loading') return
+    
+    if (status === 'unauthenticated') {
       router.push('/admin-login')
       return
     }
+    
+    if (session?.user?.email) {
+      loadMenuData(restaurantId, menuId)
+      setIsLoading(false)
+    }
+  }, [session, status, router, restaurantId, menuId])
 
-    const userObj = JSON.parse(userData)
-    setUser(userObj)
-    loadMenuData(restaurantId, menuId, userObj.email)
-    setIsLoading(false)
-  }, [router, restaurantId, menuId])
-
-  const loadMenuData = async (restId: string, menuId: string, userEmail: string) => {
+  const loadMenuData = async (restId: string, menuId: string) => {
     try {
       // Carica i dati del ristorante
-      const restaurantResponse = await fetch(`/api/restaurants?id=${restId}`, {
-        headers: {
-          'x-user-email': userEmail
-        }
-      })
+      const restaurantResponse = await fetch(`/api/restaurants?id=${restId}`)
       
       if (restaurantResponse.ok) {
         const restaurantData = await restaurantResponse.json()
@@ -66,6 +65,7 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
         if (targetMenu) {
           setMenu(targetMenu)
           setCategories(targetMenu.categories || [])
+          setMenuCoverImage(targetMenu.coverImage || null)
         } else {
           router.push(`/admin-dashboard/restaurants/${restId}`)
         }
@@ -81,16 +81,13 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
   const deleteCategory = async (categoryId: string) => {
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers: {
-          'x-user-email': user.email
-        }
-      })
+        const response = await fetch(`/api/categories/${categoryId}`, {
+          method: 'DELETE'
+        })
 
       if (response.ok) {
         // Ricarica i dati del menu
-        await loadMenuData(restaurantId, menuId, user.email)
+        await loadMenuData(restaurantId, menuId)
         setShowDeleteCategory(null)
       } else {
         const data = await response.json()
@@ -111,8 +108,7 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
         fetch('/api/categories', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'x-user-email': user.email
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             name: categoryName,
@@ -127,7 +123,7 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
 
       if (allSuccessful) {
         // Ricarica i dati del menu
-        await loadMenuData(restaurantId, menuId, user.email)
+        await loadMenuData(restaurantId, menuId)
         setShowAddCategories(false)
       } else {
         alert('Errore nell\'aggiunta di alcune categorie')
@@ -152,7 +148,7 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'x-user-email': session?.user?.email || ''
         },
         body: JSON.stringify({
           categories: categories.map((category, index) => ({
@@ -180,14 +176,13 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
   const handleSaveMenu = async (menuData: any) => {
     setIsSavingMenu(true)
     try {
-      const response = await fetch(`/api/menus/${menuId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': user.email
-        },
-        body: JSON.stringify(menuData)
-      })
+        const response = await fetch(`/api/menus/${menuId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(menuData)
+        })
 
       if (response.ok) {
         const updatedMenu = await response.json()
@@ -206,7 +201,85 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
     }
   }
 
-  if (isLoading || !user) {
+  const handleUpdateCategoryImage = async (categoryId: string, imageFile: File) => {
+    setIsUploadingImage(categoryId)
+    
+    // Store original state for rollback
+    const originalCategories = [...categories]
+    
+    // Create preview immediately for better UX
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const previewUrl = e.target?.result as string
+      // Update immediately with preview
+      setCategories(prevCategories => 
+        prevCategories.map(cat => 
+          cat.id === categoryId 
+            ? { ...cat, coverImage: previewUrl }
+            : cat
+        )
+      )
+    }
+    reader.readAsDataURL(imageFile)
+    
+    try {
+      const formData = new FormData()
+      formData.append('image', imageFile)
+
+      const response = await fetch(`/api/categories/${categoryId}/cover-image`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Server response:', data) // Debug log
+        
+        // Update with final server response
+        setCategories(prevCategories => 
+          prevCategories.map(cat => 
+            cat.id === categoryId 
+              ? { ...cat, coverImage: data.category.coverImage } // Use proper coverImage field
+              : cat
+          )
+        )
+        
+        // Show success message briefly
+        const successMsg = document.createElement('div')
+        successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50'
+        successMsg.textContent = 'Immagine aggiornata!'
+        document.body.appendChild(successMsg)
+        setTimeout(() => successMsg.remove(), 2000)
+        
+        // Force a re-render by updating the state again
+        setTimeout(() => {
+          setCategories(prevCategories => 
+            prevCategories.map(cat => 
+              cat.id === categoryId 
+                ? { ...cat, coverImage: data.category.coverImage } // Use proper coverImage field
+                : cat
+            )
+          )
+        }, 100)
+        
+      } else {
+        const errorData = await response.json()
+        console.error('Server error:', errorData)
+        // Revert to original state on error
+        setCategories(originalCategories)
+        alert(errorData.error || 'Errore nell\'aggiornamento dell\'immagine')
+      }
+    } catch (error) {
+      console.error('Errore nell\'aggiornamento dell\'immagine:', error)
+      // Revert to original state on error
+      setCategories(originalCategories)
+      alert('Errore di connessione')
+    } finally {
+      setIsUploadingImage(null)
+    }
+  }
+
+  if (isLoading || !session) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -217,12 +290,13 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
     )
   }
 
+
   if (!restaurant || !menu) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center text-gray-600">
           <p>Menu non trovato.</p>
-          <button onClick={() => router.push('/admin-dashboard')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+          <button onClick={() => router.push('/admin-dashboard')} className="cursor-pointer mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
             Torna alla Dashboard
           </button>
         </div>
@@ -232,49 +306,58 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
+        <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{menu.name}</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{menu.name}</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-2">
               Gestisci le categorie e i piatti per <strong>{restaurant.name}</strong>
             </p>
           </div>
           <button
             onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}`)}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+            className="cursor-pointer bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center space-x-2 w-full sm:w-auto"
           >
-            <ArrowLeft size={20} />
-            <span>Torna al Ristorante</span>
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            <span className="text-sm sm:text-base">Torna all'attività</span>
           </button>
         </div>
 
         {/* Menu Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Informazioni Menu */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Informazioni Menu</h2>
-            <p className="text-gray-700 mb-2"><strong>Nome:</strong> {menu.name}</p>
-            <p className="text-gray-700 mb-2"><strong>Descrizione:</strong> {menu.description || 'Nessuna descrizione'}</p>
-            <p className="text-gray-700 mb-2"><strong>QR Code:</strong> {menu.qrCodes && menu.qrCodes.length > 0 ? menu.qrCodes[0].code : 'N/A'}</p>
-            <p className="text-gray-700 mb-4"><strong>Categorie:</strong> {categories.length}</p>
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 sm:mb-4">Informazioni Menu</h2>
+            <p className="text-sm sm:text-base text-gray-700 mb-2"><strong>Nome:</strong> {menu.name}</p>
+            <p className="text-sm sm:text-base text-gray-700 mb-2"><strong>Descrizione Menu:</strong> {menu.description || 'Nessuna descrizione'}</p>
+            <p className="text-sm sm:text-base text-gray-700 mb-2"><strong>QR Code Menu:</strong> {menu.qrCodes && menu.qrCodes.length > 0 ? menu.qrCodes[0].code : 'N/A'}</p>
+            <p className="text-sm sm:text-base text-gray-700 mb-4"><strong>Categorie Menu:</strong> {categories.length}</p>
             
-            <div className="flex space-x-2">
+            {/* Menu Cover Image Upload */}
+            <div className="mt-4 sm:mt-6 mb-4 sm:mb-6">
+              <MenuCoverImageUpload
+                menuId={menuId}
+                currentImage={menuCoverImage}
+                onImageUpdate={setMenuCoverImage}
+              />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2">
               <button 
                 onClick={() => setShowEditMenu(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+                className="cursor-pointer bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center w-full sm:w-auto"
               >
                 <Edit className="h-4 w-4 mr-2" />
-                Modifica Menu
+                <span className="text-sm sm:text-base">Modifica Menu</span>
               </button>
-              {menu.qrCodes && menu.qrCodes.length > 0 && (
+              {restaurant.slug && (
                 <a
-                  href={`/menu/${menu.qrCodes[0].code}`}
+                  href={`/menu/${restaurant.slug}`}
                   target="_blank"
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+                  className="bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center w-full sm:w-auto"
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Vedi Cliente
+                  <span className="text-sm sm:text-base">Vedi Menu</span>
                 </a>
               )}
             </div>
@@ -282,53 +365,64 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
 
           {/* QR Code Generator */}
           <QRCodeGenerator 
-            url={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/menu/${restaurant?.name || 'RISTORANTE1'}`}
+            url={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/menu/${menu.qrCodes && menu.qrCodes.length > 0 ? menu.qrCodes[0].code : 'menu-' + menuId}?menuId=${menuId}`}
             menuName={menu.name}
           />
+          
+          {/* Scansioni QR Button */}
+          <div className="mt-4">
+            <button
+              onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}/menus/${menuId}/qr-scans`)}
+              className="cursor-pointer w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center"
+            >
+              <BarChart3 className="h-5 w-5 mr-2" />
+              Scansioni QR
+            </button>
+          </div>
         </div>
 
         {/* Categories Management */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Categorie</h2>
-              <p className="text-sm text-gray-600 mt-1">
-                Trascina le categorie per riordinarle. L'ordinamento influenzerà la visualizzazione nel menu cliente.
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Categorie</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                Trascina le categorie per riordinarle. L'ordinamento influenzera la visualizzazione nel menu cliente.
               </p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               {hasUnsavedChanges && (
                 <button
                   onClick={saveCategoriesOrder}
                   disabled={isSavingOrder}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
+                  className="cursor-pointer bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 w-full sm:w-auto"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {isSavingOrder ? 'Salvataggio...' : 'Salva Ordinamento'}
+                  <span className="text-sm sm:text-base">{isSavingOrder ? 'Salvataggio...' : 'Salva Ordinamento'}</span>
                 </button>
               )}
               <button
                 onClick={() => setShowAddCategories(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+                className="cursor-pointer bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Aggiungi Categorie
+                <span className="text-sm sm:text-base">Aggiungi Categorie</span>
               </button>
             </div>
           </div>
 
           {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">Nessuna categoria trovata.</p>
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-sm sm:text-base text-gray-600 mb-4">Nessuna categoria trovata.</p>
               <button
                 onClick={() => setShowAddCategories(true)}
-                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                className="bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
               >
                 Aggiungi Categorie
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <SortableCategories
                 categories={categories}
                 onCategoriesReorder={handleCategoriesReorder}
@@ -336,6 +430,9 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
                   router.push(`/admin-dashboard/restaurants/${restaurantId}/menus/${menuId}/categories/${categoryId}`)
                 }}
                 onDeleteCategory={setShowDeleteCategory}
+                onUpdateCategoryImage={handleUpdateCategoryImage}
+                isUploadingImage={isUploadingImage}
+                onRefresh={() => loadMenuData(restaurantId, menuId)}
               />
             </div>
           )}
@@ -349,7 +446,7 @@ export default function MenuManagementPage({ params }: MenuManagementPageProps) 
           onClose={() => setShowDeleteCategory(null)}
           onConfirm={() => deleteCategory(showDeleteCategory)}
           title="Elimina Categoria"
-          message={`Sei sicuro di voler eliminare questa categoria? Questa azione eliminerà anche tutti i piatti associati.`}
+          message={`Sei sicuro di voler eliminare questa categoria? Questa azione eliminera anche tutti i piatti associati.`}
           itemName={categories.find(c => c.id === showDeleteCategory)?.name || ''}
           isDeleting={isDeleting}
         />

@@ -1,6 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { z } from 'zod'
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateMenuRequest:
+ *       type: object
+ *       required:
+ *         - name
+ *         - restaurantId
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Nome del menu
+ *         description:
+ *           type: string
+ *           description: Descrizione del menu
+ *         restaurantId:
+ *           type: string
+ *           description: ID del ristorante
+ *     Menu:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         description:
+ *           type: string
+ *         isActive:
+ *           type: boolean
+ *         restaurantId:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *         qrCode:
+ *           type: string
+ *           description: Codice QR generato automaticamente
+ */
 
 const createMenuSchema = z.object({
   name: z.string().min(1, 'Nome menu richiesto'),
@@ -8,21 +52,76 @@ const createMenuSchema = z.object({
   restaurantId: z.string().min(1, 'Restaurant ID richiesto'),
 })
 
+/**
+ * @swagger
+ * /api/menus:
+ *   post:
+ *     summary: Crea un nuovo menu
+ *     description: Crea un nuovo menu per un ristorante e genera automaticamente un QR code
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateMenuRequest'
+ *     responses:
+ *       200:
+ *         description: Menu creato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 menu:
+ *                   $ref: '#/components/schemas/Menu'
+ *       400:
+ *         description: Dati non validi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Non autorizzato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Non autorizzato per questo ristorante
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Utente o ristorante non trovato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { name, description, restaurantId } = createMenuSchema.parse(body)
 
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {
@@ -78,6 +177,45 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * @swagger
+ * /api/menus:
+ *   get:
+ *     summary: Recupera i menu di un ristorante
+ *     description: Recupera tutti i menu di un ristorante specifico
+ *     tags: [Menus]
+ *     parameters:
+ *       - in: query
+ *         name: restaurantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del ristorante
+ *     responses:
+ *       200:
+ *         description: Lista dei menu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 menus:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Menu'
+ *       400:
+ *         description: Restaurant ID richiesto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)

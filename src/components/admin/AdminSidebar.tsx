@@ -11,7 +11,9 @@ import {
   faList, 
   faCog,
   faBars,
-  faX
+  faX,
+  faLeaf,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons'
 
 const navigation = [
@@ -19,6 +21,7 @@ const navigation = [
   { name: 'Ristoranti', href: '/admin/restaurants', icon: faUtensils },
   { name: 'Menu', href: '/admin/menus', icon: faList },
   { name: 'QR Codes', href: '/admin/qr-codes', icon: faQrcode },
+  { name: 'Ingredienti & Allergeni', href: '/admin/ingredients-allergens', icon: faLeaf },
   { name: 'Impostazioni', href: '/admin/settings', icon: faCog },
 ]
 

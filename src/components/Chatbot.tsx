@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, User, X } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUtensils } from '@fortawesome/free-solid-svg-icons'
+import { faComment, faUtensils } from '@fortawesome/free-solid-svg-icons'
 import DishCard from './DishCard'
 import DishDetailModal from './DishDetailModal'
 
@@ -12,6 +12,7 @@ interface ChatbotProps {
   menuId: string
   dishes: any[]
   onAddToCart?: (dish: any, quantity: number) => void
+  ordersEnabled?: boolean
 }
 
 interface Message {
@@ -22,13 +23,13 @@ interface Message {
   dish?: any
 }
 
-export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: ChatbotProps) {
+export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart, ordersEnabled = true }: ChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: 'Ciao! Sono il tuo assistente AI per il menu. Posso aiutarti a trovare piatti, rispondere a domande su allergeni, ingredienti o darti raccomandazioni personalizzate. Cosa vorresti sapere?',
+      content: 'Ciao! Sono ChefBot. Posso aiutarti a trovare piatti, allergeni e ingredienti. Cosa cerchi?',
       timestamp: new Date()
     }
   ])
@@ -42,6 +43,8 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
   const questionsContainerRef = useRef<HTMLDivElement>(null)
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -97,11 +100,15 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
   const handleDishView = (dish: any) => {
     setSelectedDish(dish)
     setIsModalOpen(true)
+    // Chiudi automaticamente il chatbot quando si clicca su "Vedi"
+    setIsOpen(false)
   }
 
   const handleDishAddToOrder = (dish: any, quantity: number) => {
-    // TODO: Implementare logica carrello
-    console.log(`Aggiunto al carrello: ${quantity}x ${dish.name}`)
+    // Aggiungi al carrello se la funzione è disponibile
+    if (onAddToCart) {
+      onAddToCart(dish, quantity)
+    }
     
     // Aggiungi messaggio di conferma
     const confirmationMessage: Message = {
@@ -190,26 +197,111 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
     }
   }
 
-  const suggestedQuestions = [
-    "Quali piatti sono vegetariani?",
-    "Hai qualcosa senza glutine?",
-    "Cosa mi consigli per un pranzo leggero?",
-    "Quali sono i piatti più popolari?",
-    "Hai bevande analcoliche?",
-    "Cosa mi consigli per un vegano?",
-    "Quali sono i prezzi più bassi?",
-    "Hai qualcosa di piccante?"
-  ]
+  const questionCategories = {
+    "Dieta e Allergie": [
+      "Quali piatti sono vegetariani?",
+      "Hai qualcosa senza glutine?",
+      "Cosa mi consigli per un vegano?",
+      "Hai opzioni per celiaci?"
+    ],
+    "Raccomandazioni": [
+      "Cosa mi consigli per un pranzo leggero?",
+      "Quali sono i piatti più popolari?",
+      "Cosa mi consigli per una cena romantica?",
+      "Quali sono i vostri piatti di punta?"
+    ],
+    "Bevande": [
+      "Hai bevande analcoliche?",
+      "Quali vini ci sono?",
+      "Avete cocktail?",
+      "Quali sono le vostre birre?"
+    ],
+    "Prezzi e Specialità": [
+      "Quali sono i prezzi più bassi?",
+      "Hai qualcosa di piccante?",
+      "Avete menu degustazione?",
+      "Quali sono le vostre specialità?"
+    ]
+  }
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category)
+    setIsCategoryModalOpen(true)
+  }
+
+  const handleSubQuestionClick = (question: string) => {
+    setIsCategoryModalOpen(false)
+    setSelectedCategory(null)
+    
+    // Invia direttamente la domanda
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: question,
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, userMessage])
+    setIsLoading(true)
+    
+    // Invia la domanda direttamente
+    fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: question,
+        restaurantId,
+        menuId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: data.response,
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, botMessage])
+
+      // Add dish cards if any dishes were mentioned
+      if (data.mentionedDishes && data.mentionedDishes.length > 0) {
+        data.mentionedDishes.forEach((dish: any) => {
+          const dishMessage: Message = {
+            id: (Date.now() + Math.random()).toString(),
+            type: 'dish',
+            content: '',
+            timestamp: new Date(),
+            dish: dish
+          }
+          setMessages(prev => [...prev, dishMessage])
+        })
+      }
+    })
+    .catch(error => {
+      console.error('Error sending message:', error)
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: 'Mi dispiace, ho avuto un problema nel rispondere. Riprova tra un momento.',
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    })
+    .finally(() => {
+      setIsLoading(false)
+    })
+  }
 
   return (
     <>
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="w-15 h-15 fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors z-50"
+        className="cursor-pointer   fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-colors z-50"
         aria-label="Apri chatbot"
       >
-        <FontAwesomeIcon icon={faUtensils} className="h-6 w-6" />
+        Vuoi un consiglio?&nbsp;
+        <FontAwesomeIcon icon={faComment} className="h-6 w-6" />
       </button>
 
       {/* Chat Modal */}
@@ -230,8 +322,8 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b bg-blue-600 text-white rounded-t-lg">
               <div className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faUtensils} className="h-5 w-5" />
-                <span className="font-semibold">Assistente AI</span>
+                <FontAwesomeIcon icon={faComment} className="h-5 w-5" />
+                <span className="font-semibold">ChefBot</span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -254,6 +346,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
                         dish={message.dish}
                         onView={handleDishView}
                         onAddToOrder={handleDishAddToOrder}
+                        ordersEnabled={ordersEnabled}
                       />
                     </div>
                   ) : (
@@ -303,7 +396,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
 
             {/* Suggested Questions - Always visible */}
             <div className="p-4 border-t bg-gray-50">
-              <p className="text-sm text-gray-600 mb-3">💡 Domande suggerite:</p>
+              <p className="text-sm text-gray-600 mb-3">💡 Potresti chiedermi..</p>
               <div 
                 ref={questionsContainerRef}
                 className={`flex gap-2 overflow-x-auto pb-2 scrollbar-hide select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
@@ -320,7 +413,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               >
-                {suggestedQuestions.map((question, index) => (
+                {Object.keys(questionCategories).map((category, index) => (
                   <button
                     key={index}
                     onClick={(e) => {
@@ -328,73 +421,11 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
                         e.preventDefault()
                         return
                       }
-                      setClickedQuestion(question)
-                      // Invia direttamente senza mostrare nell'input
-                      const userMessage: Message = {
-                        id: Date.now().toString(),
-                        type: 'user',
-                        content: question,
-                        timestamp: new Date()
-                      }
-                      setMessages(prev => [...prev, userMessage])
-                      setIsLoading(true)
-                      
-                      // Invia la domanda direttamente
-                      fetch('/api/ai/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          message: question,
-                          restaurantId,
-                          menuId
-                        })
-                      })
-                      .then(response => response.json())
-                      .then(data => {
-                        const botMessage: Message = {
-                          id: (Date.now() + 1).toString(),
-                          type: 'bot',
-                          content: data.response,
-                          timestamp: new Date()
-                        }
-                        setMessages(prev => [...prev, botMessage])
-
-                        // Add dish cards if any dishes were mentioned
-                        if (data.mentionedDishes && data.mentionedDishes.length > 0) {
-                          data.mentionedDishes.forEach((dish: any) => {
-                            const dishMessage: Message = {
-                              id: (Date.now() + Math.random()).toString(),
-                              type: 'dish',
-                              content: '',
-                              timestamp: new Date(),
-                              dish: dish
-                            }
-                            setMessages(prev => [...prev, dishMessage])
-                          })
-                        }
-                      })
-                      .catch(error => {
-                        console.error('Error sending message:', error)
-                        const errorMessage: Message = {
-                          id: (Date.now() + 1).toString(),
-                          type: 'bot',
-                          content: 'Mi dispiace, ho avuto un problema nel rispondere. Riprova tra un momento.',
-                          timestamp: new Date()
-                        }
-                        setMessages(prev => [...prev, errorMessage])
-                      })
-                      .finally(() => {
-                        setIsLoading(false)
-                        setClickedQuestion(null)
-                      })
+                      handleCategoryClick(category)
                     }}
-                    className={`flex-shrink-0 text-xs px-3 py-2 rounded-full border transition-all duration-200 shadow-sm hover:shadow-md ${
-                      clickedQuestion === question
-                        ? 'bg-green-200 text-green-800 border-green-300 scale-95'
-                        : 'bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200 hover:border-blue-300 hover:scale-105'
-                    }`}
+                    className="flex-shrink-0 text-xs px-3 py-2 rounded-full border transition-all duration-200 shadow-sm hover:shadow-md bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200 hover:border-blue-300 hover:scale-105"
                   >
-                    {question}
+                    {category}
                   </button>
                 ))}
               </div>
@@ -432,6 +463,42 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart }: C
         dish={selectedDish}
         onAddToCart={onAddToCart}
       />
+
+      {/* Modal categorie domande */}
+      {isCategoryModalOpen && selectedCategory && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
+            <div className="p-4 border-b bg-blue-600 text-white rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">{selectedCategory}</h3>
+                <button
+                  onClick={() => {
+                    setIsCategoryModalOpen(false)
+                    setSelectedCategory(null)
+                  }}
+                  className="text-white hover:text-gray-200"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <div className="space-y-2">
+                {questionCategories[selectedCategory as keyof typeof questionCategories].map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSubQuestionClick(question)}
+                    className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

@@ -4,6 +4,60 @@ import { prisma } from '@/lib/db/prisma'
 import QRCode from 'qrcode'
 import { z } from 'zod'
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     GenerateQRRequest:
+ *       type: object
+ *       required:
+ *         - name
+ *         - restaurantId
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Nome del QR code
+ *         description:
+ *           type: string
+ *           description: Descrizione del QR code
+ *         restaurantId:
+ *           type: string
+ *           description: ID del ristorante
+ *         menuId:
+ *           type: string
+ *           description: ID del menu (opzionale)
+ *     GenerateQRResponse:
+ *       type: object
+ *       properties:
+ *         qrCode:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *             code:
+ *               type: string
+ *             name:
+ *               type: string
+ *             description:
+ *               type: string
+ *             restaurantId:
+ *               type: string
+ *             menuId:
+ *               type: string
+ *             isActive:
+ *               type: boolean
+ *             restaurant:
+ *               type: object
+ *             menu:
+ *               type: object
+ *         qrCodeImage:
+ *           type: string
+ *           description: Data URL dell'immagine QR code
+ *         qrCodeURL:
+ *           type: string
+ *           description: URL del QR code
+ */
+
 const generateQRSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
@@ -11,6 +65,53 @@ const generateQRSchema = z.object({
   menuId: z.string().optional(),
 })
 
+/**
+ * @swagger
+ * /api/qr/generate:
+ *   post:
+ *     summary: Genera un QR code
+ *     description: Genera un nuovo QR code per un ristorante o menu
+ *     tags: [QR Code]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/GenerateQRRequest'
+ *     responses:
+ *       200:
+ *         description: QR code generato con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GenerateQRResponse'
+ *       400:
+ *         description: Dati non validi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Non autorizzato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Ristorante non trovato o accesso negato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()

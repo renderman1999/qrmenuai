@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 
 export async function DELETE(
@@ -6,16 +7,17 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: categoryId } = await params
-    const userEmail = request.headers.get('x-user-email')
+    const session = await auth()
     
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
+
+    const { id: categoryId } = await params
 
     // Trova l'utente
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {

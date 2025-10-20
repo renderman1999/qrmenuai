@@ -1,24 +1,141 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/db/prisma'
 import MenuDisplay from '@/components/MenuDisplay'
+import RestaurantLanding from '@/components/RestaurantLanding'
 
 interface MenuPageProps {
   params: {
     qrCode: string
   }
+  searchParams: {
+    menuId?: string
+  }
 }
 
-export default async function MenuPage({ params }: MenuPageProps) {
+export default async function MenuPage({ params, searchParams }: MenuPageProps) {
   const { qrCode } = await params
+  const { menuId } = await searchParams
 
-  // Find QR code and get menu data
+  // Try to find by QR code first, then by slug
+  let restaurant = null
+  
+  // First try QR code
   const qrCodeData = await prisma.qRCode.findUnique({
     where: {
       code: qrCode,
       isActive: true
     },
     include: {
-      menu: {
+      restaurant: {
+        include: {
+          menus: {
+            where: { isActive: true }
+          },
+          articles: {
+            orderBy: { createdAt: 'desc' }
+          },
+          reviews: {
+            orderBy: { createdAt: 'desc' }
+          }
+        }
+      }
+    }
+  })
+
+  if (qrCodeData && qrCodeData.restaurant) {
+    restaurant = qrCodeData.restaurant
+  } else {
+    // Try to find by slug
+    const restaurantBySlug = await prisma.restaurant.findUnique({
+      where: {
+        slug: qrCode,
+        isActive: true
+      },
+      include: {
+        menus: {
+          where: { isActive: true }
+        },
+        articles: {
+          orderBy: { createdAt: 'desc' }
+        },
+        reviews: {
+          orderBy: { createdAt: 'desc' }
+        }
+      }
+    })
+    
+    if (restaurantBySlug) {
+      restaurant = restaurantBySlug
+    }
+  }
+
+  if (!restaurant) {
+    notFound()
+  }
+
+  // Assicurati che i campi ordersEnabled e chatbotEnabled esistano
+  if (restaurant) {
+    const restaurantAny = restaurant as any
+    
+    // Controlla ordersEnabled
+    if (typeof restaurantAny.ordersEnabled === 'undefined') {
+      // Prova a leggere dal campo socialLinks
+      const socialLinks = restaurantAny.socialLinks
+      if (socialLinks && typeof socialLinks === 'object' && socialLinks.ordersEnabled !== undefined) {
+        console.log('📦 Using socialLinks for ordersEnabled:', socialLinks.ordersEnabled)
+        restaurantAny.ordersEnabled = socialLinks.ordersEnabled
+      } else {
+        console.log('⚠️ Using default for ordersEnabled')
+        restaurantAny.ordersEnabled = false
+      }
+    } else {
+      console.log('✅ Using direct database field for ordersEnabled:', restaurantAny.ordersEnabled)
+    }
+    
+    // Controlla chatbotEnabled
+    if (typeof restaurantAny.chatbotEnabled === 'undefined') {
+      // Prova a leggere dal campo socialLinks
+      const socialLinks = restaurantAny.socialLinks
+      if (socialLinks && typeof socialLinks === 'object' && socialLinks.chatbotEnabled !== undefined) {
+        console.log('📦 Using socialLinks for chatbotEnabled:', socialLinks.chatbotEnabled)
+        restaurantAny.chatbotEnabled = socialLinks.chatbotEnabled
+      } else {
+        console.log('⚠️ Using default for chatbotEnabled')
+        restaurantAny.chatbotEnabled = false
+      }
+    } else {
+      console.log('✅ Using direct database field for chatbotEnabled:', restaurantAny.chatbotEnabled)
+    }
+  }
+
+  // Debug: log dei valori per verificare
+  console.log('🔍 Restaurant debug:', {
+    id: restaurant?.id,
+    name: restaurant?.name,
+    ordersEnabled: (restaurant as any)?.ordersEnabled,
+    chatbotEnabled: (restaurant as any)?.chatbotEnabled,
+    socialLinks: (restaurant as any)?.socialLinks,
+    hasSocialLinks: !!(restaurant as any)?.socialLinks
+  })
+
+  // Track QR scan only if accessed via QR code
+  if (qrCodeData) {
+    // The tracking will be handled by the client-side component
+    // to get accurate IP and user agent information
+  }
+
+  // Calculate average rating
+  const averageRating = restaurant.reviews && restaurant.reviews.length > 0 
+    ? restaurant.reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / restaurant.reviews.length 
+    : 0
+
+  // If menuId is provided, show the specific menu
+  if (menuId) {
+    const specificMenu = restaurant.menus?.find(menu => menu.id === menuId)
+    if (specificMenu) {
+      // Load the menu with categories and dishes
+      const menuWithData = await prisma.menu.findUnique({
+        where: { id: menuId },
         include: {
           categories: {
             where: { isActive: true },
@@ -41,53 +158,50 @@ export default async function MenuPage({ params }: MenuPageProps) {
               }
             },
             orderBy: { sortOrder: 'asc' }
-          },
-          restaurant: true
+          }
         }
-      },
-      restaurant: true
+      })
+      
+      if (menuWithData) {
+        // Converti i valori Decimal in stringhe per evitare errori di serializzazione
+        const serializedMenu = JSON.parse(JSON.stringify(menuWithData, (key, value) => {
+          if (value && typeof value === 'object' && value.constructor && value.constructor.name === 'Decimal') {
+            return value.toString()
+          }
+          return value
+        }))
+        
+        return (
+          <div className="min-h-screen bg-gray-50">
+            <MenuDisplay 
+              restaurant={restaurant}
+              menu={serializedMenu}
+              qrCodeId={qrCodeData?.id}
+            />
+          </div>
+        )
+      }
     }
-  })
-
-  if (!qrCodeData || !qrCodeData.menu) {
-    notFound()
   }
 
-  // Track QR scan
-  await prisma.qRCode.update({
-    where: { id: qrCodeData.id },
-    data: {
-      scanCount: { increment: 1 },
-      lastScanned: new Date()
+  // Serializza i dati per evitare errori con oggetti Decimal
+  const serializedRestaurant = JSON.parse(JSON.stringify(restaurant, (key, value) => {
+    if (value && typeof value === 'object' && value.constructor && value.constructor.name === 'Decimal') {
+      return value.toString()
     }
-  })
-
-  // Create QR scan record
-  await prisma.qRScan.create({
-    data: {
-      qrCodeId: qrCodeData.id,
-      ipAddress: 'unknown', // Will be filled by middleware
-      userAgent: 'unknown' // Will be filled by middleware
-    }
-  })
-
-  // Convert Decimal prices to numbers for client components
-  const serializedMenu = {
-    ...qrCodeData.menu,
-    categories: qrCodeData.menu.categories.map(category => ({
-      ...category,
-      dishes: category.dishes.map(dish => ({
-        ...dish,
-        price: Number(dish.price)
-      }))
-    }))
-  }
+    return value
+  }))
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <MenuDisplay 
-        menu={serializedMenu}
-        restaurant={qrCodeData.restaurant}
+      <RestaurantLanding
+        restaurant={serializedRestaurant}
+        menus={serializedRestaurant.menus || []}
+        articles={serializedRestaurant.articles || []}
+        reviews={serializedRestaurant.reviews || []}
+        averageRating={averageRating}
+        totalReviews={serializedRestaurant.reviews?.length || 0}
+        qrCodeId={qrCodeData?.id}
       />
     </div>
   )
@@ -96,24 +210,37 @@ export default async function MenuPage({ params }: MenuPageProps) {
 export async function generateMetadata({ params }: MenuPageProps) {
   const { qrCode } = await params
   
+  // Try to find by QR code first, then by slug
+  let restaurant = null
+  
   const qrCodeData = await prisma.qRCode.findUnique({
     where: { code: qrCode },
     include: {
-      menu: {
-        include: { restaurant: true }
-      }
+      restaurant: true
     }
   })
 
-  if (!qrCodeData?.menu) {
+  if (qrCodeData?.restaurant) {
+    restaurant = qrCodeData.restaurant
+  } else {
+    // Try to find by slug
+    const restaurantBySlug = await prisma.restaurant.findUnique({
+      where: { slug: qrCode }
+    })
+    if (restaurantBySlug) {
+      restaurant = restaurantBySlug
+    }
+  }
+
+  if (!restaurant) {
     return {
-      title: 'Menu Not Found',
-      description: 'The requested menu could not be found.'
+      title: 'Ristorante non trovato',
+      description: 'Il ristorante richiesto non è stato trovato.'
     }
   }
 
   return {
-    title: `${qrCodeData.menu.name} - ${qrCodeData.menu.restaurant.name}`,
-    description: qrCodeData.menu.description || `Menu for ${qrCodeData.menu.restaurant.name}`,
+    title: `${restaurant.name} - Menu Digitale`,
+    description: restaurant.description || `Scopri il menu di ${restaurant.name}`,
   }
 }

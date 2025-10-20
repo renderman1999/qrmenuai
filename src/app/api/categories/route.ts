@@ -1,6 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { z } from 'zod'
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateCategoryRequest:
+ *       type: object
+ *       required:
+ *         - name
+ *         - menuId
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Nome della categoria
+ *         description:
+ *           type: string
+ *           description: Descrizione della categoria
+ *         menuId:
+ *           type: string
+ *           description: ID del menu
+ *     Category:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         name:
+ *           type: string
+ *         description:
+ *           type: string
+ *         menuId:
+ *           type: string
+ *         sortOrder:
+ *           type: number
+ *         isActive:
+ *           type: boolean
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *         dishes:
+ *           type: array
+ *           items:
+ *             type: object
+ */
 
 const createCategorySchema = z.object({
   name: z.string().min(1, 'Nome categoria richiesto'),
@@ -8,21 +55,76 @@ const createCategorySchema = z.object({
   menuId: z.string().min(1, 'Menu ID richiesto'),
 })
 
+/**
+ * @swagger
+ * /api/categories:
+ *   post:
+ *     summary: Crea una nuova categoria
+ *     description: Crea una nuova categoria per un menu
+ *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateCategoryRequest'
+ *     responses:
+ *       200:
+ *         description: Categoria creata con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 category:
+ *                   $ref: '#/components/schemas/Category'
+ *       400:
+ *         description: Dati non validi o categoria già esistente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Non autorizzato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Non autorizzato per questo menu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Utente o menu non trovato
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { name, description, menuId } = createCategorySchema.parse(body)
 
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
-    }
-
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {
@@ -91,6 +193,45 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * @swagger
+ * /api/categories:
+ *   get:
+ *     summary: Recupera le categorie di un menu
+ *     description: Recupera tutte le categorie di un menu specifico
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: query
+ *         name: menuId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del menu
+ *     responses:
+ *       200:
+ *         description: Lista delle categorie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 categories:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Category'
+ *       400:
+ *         description: Menu ID richiesto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Errore interno del server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)

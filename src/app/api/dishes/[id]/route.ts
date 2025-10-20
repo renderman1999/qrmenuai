@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
 import { invalidateMenuCache, invalidateRestaurantCache } from '@/lib/cache/menu-cache'
 import { z } from 'zod'
@@ -6,7 +7,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 
 const updateDishSchema = z.object({
   name: z.string().min(1, 'Nome piatto richiesto').optional(),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   price: z.number().positive('Prezzo deve essere positivo').optional(),
   categoryId: z.string().optional(),
   allergenIds: z.array(z.string()).optional(),
@@ -15,7 +16,7 @@ const updateDishSchema = z.object({
   isVegan: z.boolean().optional(),
   isGlutenFree: z.boolean().optional(),
   isSpicy: z.boolean().optional(),
-  image: z.string().optional().nullable(),
+  image: z.string().nullable().optional(),
   galleryEnabled: z.boolean().optional(),
   galleryImages: z.array(z.object({
     url: z.string(),
@@ -23,6 +24,17 @@ const updateDishSchema = z.object({
     order: z.number()
   })).optional(),
   isActive: z.boolean().optional(),
+  additionalInfo: z.object({
+    sections: z.array(z.object({
+      id: z.string(),
+      type: z.enum(['text', 'video', 'youtube']),
+      title: z.string(),
+      content: z.string(),
+      videoFile: z.string().optional(),
+      youtubeId: z.string().optional(),
+      order: z.number()
+    }))
+  }).optional(),
 })
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -34,20 +46,33 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     console.log('Dish ID:', id)
     console.log('Request body:', body)
     
-    const data = updateDishSchema.parse(body)
+    let data
+    try {
+      data = updateDishSchema.parse(body)
+      console.log('Validated data:', data)
+      console.log('Validation successful')
+    } catch (validationError) {
+      console.error('Validation error details:', validationError)
+      if (validationError instanceof z.ZodError) {
+        console.error('Zod validation errors:', validationError.issues)
+        return NextResponse.json({ 
+          error: 'Dati non validi', 
+          details: validationError.issues,
+          type: 'validation_error'
+        }, { status: 400 })
+      }
+      throw validationError
+    }
+
+    const session = await auth()
     
-    console.log('Validated data:', data)
-
-    // Leggi l'email dell'utente dall'header della richiesta
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
     // Trova l'utente nel database
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {
@@ -78,7 +103,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
     }
 
-    // Aggiorna il piatto con le relazioni
+    // Aggiorna il piatto
     const updatedDish = await prisma.dish.update({
       where: { id },
       data: {
@@ -94,25 +119,50 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         ...(data.galleryEnabled !== undefined && { galleryEnabled: data.galleryEnabled }),
         ...(data.galleryImages !== undefined && { galleryImages: data.galleryImages }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
-        // Aggiorna le relazioni per allergeni
-        ...(data.allergenIds !== undefined && {
-          dishAllergens: {
-            deleteMany: {},
-            create: data.allergenIds.map(allergenId => ({
-              allergenId: allergenId
-            }))
-          }
-        }),
-        // Aggiorna le relazioni per ingredienti
-        ...(data.ingredientIds !== undefined && {
-          dishIngredients: {
-            deleteMany: {},
-            create: data.ingredientIds.map(ingredientId => ({
-              ingredientId: ingredientId
-            }))
-          }
+        ...(data.additionalInfo !== undefined && { additionalInfo: data.additionalInfo })
+      }
+    })
+
+    // Gestisci le relazioni separatamente se necessario
+    if (data.allergenIds !== undefined) {
+      // Rimuovi tutte le relazioni esistenti
+      await prisma.dishAllergen.deleteMany({
+        where: { dishId: id }
+      })
+      
+      // Rimuovi duplicati e crea le nuove relazioni solo se ci sono allergeni
+      const uniqueAllergenIds = [...new Set(data.allergenIds)]
+      if (uniqueAllergenIds.length > 0) {
+        await prisma.dishAllergen.createMany({
+          data: uniqueAllergenIds.map(allergenId => ({
+            dishId: id,
+            allergenId: allergenId
+          }))
         })
-      },
+      }
+    }
+
+    if (data.ingredientIds !== undefined) {
+      // Rimuovi tutte le relazioni esistenti
+      await prisma.dishIngredient.deleteMany({
+        where: { dishId: id }
+      })
+      
+      // Rimuovi duplicati e crea le nuove relazioni solo se ci sono ingredienti
+      const uniqueIngredientIds = [...new Set(data.ingredientIds)]
+      if (uniqueIngredientIds.length > 0) {
+        await prisma.dishIngredient.createMany({
+          data: uniqueIngredientIds.map(ingredientId => ({
+            dishId: id,
+            ingredientId: ingredientId
+          }))
+        })
+      }
+    }
+
+    // Recupera il piatto aggiornato con le relazioni
+    const finalDish = await prisma.dish.findUnique({
+      where: { id },
       include: {
         dishAllergens: {
           include: {
@@ -133,13 +183,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       invalidateRestaurantCache(dish.category.menu.restaurantId)
     ])
 
-    return NextResponse.json({ dish: updatedDish })
+    return NextResponse.json({ dish: finalDish })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error.errors)
+      console.error('Validation error:', error.issues)
       return NextResponse.json({ 
         error: 'Dati non validi', 
-        details: error.errors,
+        details: error.issues,
         type: 'validation_error'
       }, { status: 400 })
     }
@@ -155,15 +205,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params
-    const userEmail = request.headers.get('x-user-email')
-
-    if (!userEmail) {
-      return NextResponse.json({ error: 'Email utente non fornita' }, { status: 400 })
+    const session = await auth()
+    
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
+    const { id } = await params
+
     const user = await prisma.user.findUnique({
-      where: { email: userEmail }
+      where: { email: session.user.email }
     })
 
     if (!user) {

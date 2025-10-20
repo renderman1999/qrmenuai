@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { Plus, Edit, Trash2, Eye, QrCode, ChevronDown, ChevronUp } from 'lucide-react'
 import AddCategoryModal from '@/components/admin/AddCategoryModal'
 
@@ -27,7 +28,7 @@ interface Category {
 }
 
 export default function MenuManagementPage() {
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
   const [menuInfo, setMenuInfo] = useState<any>(null)
@@ -37,20 +38,18 @@ export default function MenuManagementPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('adminLoggedIn')
-    const userData = localStorage.getItem('adminUser')
+    if (status === 'loading') return
     
-    if (!isLoggedIn || !userData) {
+    if (status === 'unauthenticated') {
       router.push('/admin-login')
       return
     }
     
-        const userObj = JSON.parse(userData)
-        setUser(userObj)
-        loadMenuData(userObj.email)
-        setIsLoading(false)
-  }, [router])
+    if (session?.user?.email) {
+      loadMenuData(session.user.email)
+      setIsLoading(false)
+    }
+  }, [session, status, router])
 
       const loadMenuData = async (userEmail: string) => {
         try {
@@ -75,6 +74,21 @@ export default function MenuManagementPage() {
     }
   }
 
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return null // Il redirect è gestito nel useEffect
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -86,10 +100,6 @@ export default function MenuManagementPage() {
     )
   }
 
-  if (!user) {
-    return null
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -98,13 +108,13 @@ export default function MenuManagementPage() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Gestione Menu</h1>
             <p className="text-gray-600 mt-2">
-              Gestisci il menu del tuo ristorante, {user.name}
+              Gestisci il menu del tuo ristorante, {session?.user?.name}
             </p>
           </div>
           <div className="flex space-x-4">
             <button
               onClick={() => router.push('/admin-dashboard')}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               ← Torna alla Dashboard
             </button>
@@ -227,7 +237,7 @@ export default function MenuManagementPage() {
             onClose={() => setShowAddCategory(false)}
             onCategoryAdded={() => {
               // Ricarica i dati del menu
-              loadMenuData(user.email)
+              loadMenuData(session?.user?.email || '')
             }}
             menuId={menuInfo.id}
             restaurantId={menuInfo.restaurant.id}

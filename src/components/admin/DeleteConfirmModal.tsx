@@ -52,7 +52,7 @@ export default function DeleteConfirmModal({
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="cursor-pointer text-gray-400 hover:text-gray-600"
             disabled={isDeleting}
           >
             <X className="h-6 w-6" />
@@ -81,7 +81,7 @@ export default function DeleteConfirmModal({
               id="confirmText"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
+              className=" w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
               placeholder={itemName}
               disabled={isDeleting}
             />
@@ -91,14 +91,14 @@ export default function DeleteConfirmModal({
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="cursor-pointer px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
               disabled={isDeleting}
             >
               Annulla
             </button>
             <button
               onClick={handleConfirm}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center space-x-2 disabled:opacity-50"
+              className="cursor-pointer px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center space-x-2 disabled:opacity-50"
               disabled={isDeleting || confirmText !== itemName}
             >
               {isDeleting ? (

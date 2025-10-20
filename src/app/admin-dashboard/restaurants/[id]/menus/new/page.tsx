@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { ArrowLeft, Save, Plus } from 'lucide-react'
 
 interface NewMenuPageProps {
@@ -11,8 +12,8 @@ interface NewMenuPageProps {
 }
 
 export default function NewMenuPage({ params }: NewMenuPageProps) {
+  const { data: session, status } = useSession()
   const { id: restaurantId } = params
-  const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [restaurant, setRestaurant] = useState<any>(null)
   const [formData, setFormData] = useState({
@@ -24,19 +25,18 @@ export default function NewMenuPage({ params }: NewMenuPageProps) {
   const router = useRouter()
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('adminLoggedIn')
-    const userData = localStorage.getItem('adminUser')
-
-    if (!isLoggedIn || !userData) {
+    if (status === 'loading') return
+    
+    if (status === 'unauthenticated') {
       router.push('/admin-login')
       return
     }
-
-    const userObj = JSON.parse(userData)
-    setUser(userObj)
-    loadRestaurant(restaurantId, userObj.email)
-    setIsLoading(false)
-  }, [router, restaurantId])
+    
+    if (session?.user?.email) {
+      loadRestaurant(restaurantId, session.user.email)
+      setIsLoading(false)
+    }
+  }, [session, status, router, restaurantId])
 
   const loadRestaurant = async (restId: string, userEmail: string) => {
     try {
@@ -71,7 +71,7 @@ export default function NewMenuPage({ params }: NewMenuPageProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'x-user-email': session?.user?.email || ''
         },
         body: JSON.stringify({
           ...formData,
@@ -95,7 +95,22 @@ export default function NewMenuPage({ params }: NewMenuPageProps) {
     }
   }
 
-  if (isLoading || !user) {
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return null // Il redirect è gestito nel useEffect
+  }
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -111,7 +126,7 @@ export default function NewMenuPage({ params }: NewMenuPageProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center text-gray-600">
           <p>Ristorante non trovato.</p>
-          <button onClick={() => router.push('/admin-dashboard')} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+          <button onClick={() => router.push('/admin-dashboard')} className="cursor-pointer mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
             Torna alla Dashboard
           </button>
         </div>
@@ -131,10 +146,10 @@ export default function NewMenuPage({ params }: NewMenuPageProps) {
           </div>
           <button
             onClick={() => router.push(`/admin-dashboard/restaurants/${restaurantId}`)}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+            className="cursor-pointer bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
           >
             <ArrowLeft size={20} />
-            <span>Torna al Ristorante</span>
+            <span>Torna all'attività</span>
           </button>
         </div>
 

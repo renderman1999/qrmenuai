@@ -29,12 +29,12 @@ export interface CachedMenu {
     id: string
     name: string
     description: string | null
-    order: number
+    sortOrder: number
     dishes: Array<{
       id: string
       name: string
       description: string | null
-      price: number
+      price: any
       image: string | null
       isVegetarian: boolean
       isVegan: boolean
@@ -217,9 +217,24 @@ async function getMenuFromDatabase(menuId: string) {
         }
       },
       categories: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          sortOrder: true,
           dishes: {
-            include: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              image: true,
+              isVegetarian: true,
+              isVegan: true,
+              isGlutenFree: true,
+              isSpicy: true,
+              galleryEnabled: true,
+              galleryImages: true,
               dishAllergens: {
                 include: {
                   allergen: true

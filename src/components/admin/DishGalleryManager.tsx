@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { Plus, X, Image as ImageIcon, Trash2, Edit3, Save, Loader2 } from 'lucide-react'
 import ImageDropzone from './ImageDropzone'
 
@@ -25,6 +26,7 @@ export default function DishGalleryManager({
   onUpdate,
   restaurantId
 }: DishGalleryManagerProps) {
+  const { data: session } = useSession()
   const [galleryEnabled, setGalleryEnabled] = useState(initialGalleryEnabled)
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(initialGalleryImages || [])
   const [isSaving, setIsSaving] = useState(false)
@@ -98,8 +100,7 @@ export default function DishGalleryManager({
       const response = await fetch(`/api/dishes/${dishId}/gallery`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'x-user-email': localStorage.getItem('adminUser') ? JSON.parse(localStorage.getItem('adminUser')!).email : ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           galleryEnabled: enabled,

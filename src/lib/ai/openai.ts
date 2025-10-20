@@ -125,22 +125,29 @@ export async function chatWithAI(message: string, context: any) {
       messages: [
         {
           role: "system",
-          content: `Sei un assistente AI per un ristorante. Aiuta i clienti con domande sul menu, restrizioni dietetiche e raccomandazioni.
+          content: `Sei ChefBot, assistente AI per ristoranti. Rispondi in modo CONCISO e diretto.
 
 CONTESTO DEL MENU:
 ${contextString}
 
-ISTRUZIONI:
-- Rispondi sempre in italiano
-- Sii amichevole e informativo
-- Suggerisci piatti specifici dal menu quando appropriato
-- Considera allergeni, preferenze dietetiche e budget
-- Se non conosci qualcosa, dillo educatamente
-- Usa emoji per rendere le risposte più accattivanti
-- Fornisci prezzi quando rilevanti
-- Suggerisci combinazioni di piatti quando appropriato
+REGOLE:
+- Risposte MASSIMO 2-3 frasi
+- Sii diretto e utile
+- Per restrizioni dietetiche, suggerisci SOLO piatti con i tag corretti:
+  * [Senza glutine] = senza glutine
+  * [Vegetariano] = vegetariano  
+  * [Vegano] = vegano
+  * [Piccante] = piccante
+- Includi prezzi quando rilevanti
+- NON usare emoji nelle risposte
+- Se nessun piatto corrisponde, dillo brevemente
 
-Se il cliente chiede di un piatto specifico o menziona un piatto dal menu, includi il nome del piatto nella risposta.`
+ESEMPIO RISPOSTA CORRETTA:
+"Perfetto! Ti consiglio la Pasta al Pomodoro (€12) e l'Insalata Mista (€8). Entrambe sono vegetariane."
+
+ESEMPIO RISPOSTA SBAGLIATA (troppo lunga):
+"Grazie per la tua domanda sui piatti vegetariani. Sono felice di aiutarti a trovare le opzioni giuste per te. Nel nostro menu abbiamo diverse opzioni vegetariane che potrebbero interessarti..."
+`
         },
         {
           role: "user",
@@ -171,9 +178,25 @@ Se il cliente chiede di un piatto specifico o menziona un piatto dal menu, inclu
 function identifyDishesInResponse(response: string, allDishes: any[]): any[] {
   const mentionedDishes: any[] = []
   
-  // Simple matching - look for dish names in the response
+  // More sophisticated matching
   allDishes.forEach(dish => {
-    if (response.toLowerCase().includes(dish.name.toLowerCase())) {
+    const dishName = dish.name.toLowerCase()
+    const responseLower = response.toLowerCase()
+    
+    // Check for exact name match
+    if (responseLower.includes(dishName)) {
+      mentionedDishes.push(dish)
+      return
+    }
+    
+    // Check for partial matches (useful for dishes with long names)
+    const dishWords = dishName.split(' ')
+    const matchedWords = dishWords.filter((word: string) => 
+      word.length > 3 && responseLower.includes(word)
+    )
+    
+    // If more than 50% of words match, consider it mentioned
+    if (matchedWords.length > 0 && (matchedWords.length / dishWords.length) >= 0.5) {
       mentionedDishes.push(dish)
     }
   })

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { ArrowLeft, Save } from 'lucide-react'
 
 export default function NewRestaurantPage() {
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
@@ -20,18 +21,17 @@ export default function NewRestaurantPage() {
   })
 
   useEffect(() => {
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('adminLoggedIn')
-    const userData = localStorage.getItem('adminUser')
+    if (status === 'loading') return
     
-    if (!isLoggedIn || !userData) {
+    if (status === 'unauthenticated') {
       router.push('/admin-login')
       return
     }
     
-    setUser(JSON.parse(userData))
-    setIsLoading(false)
-  }, [router])
+    if (session?.user?.email) {
+      setIsLoading(false)
+    }
+  }, [session, status, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,7 +43,7 @@ export default function NewRestaurantPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-email': user.email
+          'x-user-email': session?.user?.email || ''
         },
         body: JSON.stringify(formData),
       })
@@ -68,7 +68,7 @@ export default function NewRestaurantPage() {
     })
   }
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -79,8 +79,19 @@ export default function NewRestaurantPage() {
     )
   }
 
-  if (!user) {
-    return null
+  if (status === 'unauthenticated') {
+    return null // Il redirect è gestito nel useEffect
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
