@@ -89,6 +89,9 @@ model Restaurant {
   whatsapp        String?     @db.VarChar(255)
   chatbotEnabled  Boolean?    @default(false)
   telegramEnabled Boolean?    @default(false)
+  telegramChannelId String?   @db.VarChar(255)
+  telegramBotToken  String?   @db.Text
+  sendOrdersToTelegram Boolean @default(false)
   analytics       Analytics[]
   articles        Article[]
   menus           Menu[]
@@ -351,6 +354,16 @@ enum LicenseTier {
   BASIC
   PREMIUM
   ENTERPRISE
+}
+
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_configs")
 }
 
 enum OrderStatus {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { chatWithAI } from '@/lib/ai/openai'
+import { chatWithAI } from '@/lib/ai/ai-service'
 import { getMenuWithCache, getRestaurantWithCache } from '@/lib/cache/menu-cache'
 import { z } from 'zod'
 

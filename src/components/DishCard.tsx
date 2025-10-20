@@ -85,14 +85,14 @@ export default function DishCard({ dish, onView, onAddToOrder, ordersEnabled = t
               <div className="flex items-center space-x-1">
                 <button
                   onClick={() => handleQuantityChange(-1)}
-                  className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  className="cursor-pointer w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                 >
                   <span className="text-sm">-</span>
                 </button>
                 <span className="w-8 text-center text-sm font-medium">{quantity}</span>
                 <button
                   onClick={() => handleQuantityChange(1)}
-                  className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  className="cursor-pointer w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                 >
                   <span className="text-sm">+</span>
                 </button>
@@ -105,7 +105,7 @@ export default function DishCard({ dish, onView, onAddToOrder, ordersEnabled = t
         <div className="flex space-x-2">
           <button
             onClick={() => onView(dish)}
-            className="flex-1 flex items-center justify-center px-3 py-1.5 text-xs border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            className="cursor-pointer flex-1 flex items-center justify-center px-3 py-1.5 text-xs border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Eye size={12} className="mr-1" />
             Vedi
@@ -113,7 +113,7 @@ export default function DishCard({ dish, onView, onAddToOrder, ordersEnabled = t
           {ordersEnabled && (
             <button
               onClick={handleAddToOrder}
-              className="flex-1 flex items-center justify-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="cursor-pointer flex-1 flex items-center justify-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               <ShoppingCart size={12} className="mr-1" />
               Aggiungi all'ordine

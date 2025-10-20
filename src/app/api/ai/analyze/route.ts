@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth/auth'
 import { prisma } from '@/lib/db/prisma'
-import { analyzeDish } from '@/lib/ai/openai'
+import { analyzeDish } from '@/lib/ai/ai-service'
 import { redis } from '@/lib/redis/redis'
 import { z } from 'zod'
 

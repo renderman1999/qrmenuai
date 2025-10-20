@@ -19,7 +19,22 @@ const updateRestaurantSchema = z.object({
   isActive: z.boolean().optional(),
   ordersEnabled: z.boolean().optional(),
   chatbotEnabled: z.boolean().optional(),
-  telegramEnabled: z.boolean().optional()
+  telegramEnabled: z.boolean().optional(),
+  sendOrdersToTelegram: z.boolean().optional(),
+  telegramChannelId: z
+    .string()
+    .optional()
+    .refine(
+      (val) =>
+        val === undefined ||
+        val === '' ||
+        /^@[A-Za-z0-9_]{5,32}$/.test(val) ||
+        /^-?\d{5,20}$/.test(val),
+      {
+        message: 'Formato non valido. Usa @nome_canale (5-32 chars) o ID numerico',
+      }
+    ),
+  telegramBotToken: z.string().optional().or(z.literal(''))
 })
 
 function createSlug(name: string): string {
@@ -138,10 +153,13 @@ export async function PUT(
     console.log('📝 Request body:', body)
     const validatedData = updateRestaurantSchema.parse(body)
     console.log('✅ Validated data:', validatedData)
-    console.log('🔍 Orders/Chatbot/Telegram values:', {
+  console.log('🔍 Orders/Chatbot/Telegram values:', {
       ordersEnabled: validatedData.ordersEnabled,
       chatbotEnabled: validatedData.chatbotEnabled,
-      telegramEnabled: validatedData.telegramEnabled
+    telegramEnabled: validatedData.telegramEnabled,
+    telegramChannelId: validatedData.telegramChannelId,
+    sendOrdersToTelegram: validatedData.sendOrdersToTelegram,
+    hasBotToken: !!validatedData.telegramBotToken
     })
 
     // Prepara i dati di aggiornamento
@@ -160,7 +178,10 @@ export async function PUT(
       ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
       ...(validatedData.ordersEnabled !== undefined && { ordersEnabled: validatedData.ordersEnabled }),
       ...(validatedData.chatbotEnabled !== undefined && { chatbotEnabled: validatedData.chatbotEnabled }),
-      ...(validatedData.telegramEnabled !== undefined && { telegramEnabled: validatedData.telegramEnabled })
+      ...(validatedData.telegramEnabled !== undefined && { telegramEnabled: validatedData.telegramEnabled }),
+      ...(validatedData.telegramChannelId !== undefined && { telegramChannelId: validatedData.telegramChannelId || null }),
+      ...(validatedData.telegramBotToken !== undefined && { telegramBotToken: validatedData.telegramBotToken || null })
+      ,...(validatedData.sendOrdersToTelegram !== undefined && { sendOrdersToTelegram: validatedData.sendOrdersToTelegram })
     }
     
     console.log('🔄 Update data:', updateData)

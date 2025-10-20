@@ -6,6 +6,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { Trash2 } from 'lucide-react'
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal'
 import ProfileManager from '@/components/admin/ProfileManager'
+import AIConfigManager from '@/components/admin/AIConfigManager'
 
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession()
@@ -14,7 +15,7 @@ export default function AdminDashboardPage() {
   const [isLoadingRestaurants, setIsLoadingRestaurants] = useState(true)
   const [showDeleteRestaurant, setShowDeleteRestaurant] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'profile' | 'system'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'profile' | 'system' | 'ai-config'>('dashboard')
   
   // System management states
   const [allRestaurants, setAllRestaurants] = useState<any[]>([])
@@ -188,6 +189,18 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 Gestione Sistema
+              </button>
+            )}
+            {session?.user?.role === 'ADMIN' && (
+              <button
+                onClick={() => setActiveTab('ai-config')}
+                className={`cursor-pointer py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === 'ai-config'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Configurazione AI
               </button>
             )}
             {session?.user?.role === 'ADMIN' && (
@@ -418,6 +431,12 @@ export default function AdminDashboardPage() {
         {activeTab === 'profile' && (
           <div className="space-y-6">
             <ProfileManager />
+          </div>
+        )}
+
+        {activeTab === 'ai-config' && session?.user?.role === 'ADMIN' && (
+          <div className="space-y-6">
+            <AIConfigManager />
           </div>
         )}
 

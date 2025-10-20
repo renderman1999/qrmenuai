@@ -52,8 +52,6 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
   const [showOrderForm, setShowOrderForm] = useState(false)
   const [orderData, setOrderData] = useState({
     tableNumber: '',
-    customerName: '',
-    customerPhone: '',
     notes: ''
   })
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false)
@@ -161,10 +159,7 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
           restaurantId: restaurant.id,
           tableNumber: orderData.tableNumber,
           notes: orderData.notes,
-          customerInfo: {
-            name: orderData.customerName,
-            phone: orderData.customerPhone
-          },
+          customerInfo: {},
           items: orderItems
         })
       })
@@ -172,12 +167,20 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
       const data = await response.json()
 
       if (data.success) {
+        // Invia su Telegram se abilitato e configurato lato ristorante (non blocca il flow)
+        try {
+          if (restaurant?.telegramEnabled && restaurant?.sendOrdersToTelegram && restaurant?.telegramChannelId) {
+            fetch('/api/orders/telegram', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId: data.order.id, tableNumber: orderData.tableNumber })
+            }).catch(() => {})
+          }
+        } catch {}
         // Reset form and cart
         setCart([])
         setOrderData({
           tableNumber: '',
-          customerName: '',
-          customerPhone: '',
           notes: ''
         })
         setShowOrderForm(false)
@@ -229,7 +232,22 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
                 <p className="text-sm text-gray-600">{menu.name}</p>
               </div>
             </div>
-
+            <div className="flex items-center justify-center">
+            <div className="flex-1 w-full">
+              <div className="relative">
+                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Cerca nel menu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                />
+              </div>
+            </div>
+          </div>
             {/* Carrello - solo se ordini abilitati */}
             {restaurant.ordersEnabled && (
               <button 
@@ -248,35 +266,15 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
         </div>
       </nav>
 
-      {/* Header con ricerca */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-center">
-            <div className="flex-1 max-w-md">
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Cerca nel menu..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+   
 
       {/* Navigazione Categorie */}
-      <div className="bg-white border-b">
+      <div className="bg-white  ">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex overflow-x-auto py-4 space-x-1">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
+              className={`cursor-pointer px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
                 !selectedCategory 
                   ? 'bg-blue-100 text-blue-800' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -288,7 +286,7 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
+                className={`cursor-pointer px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${
                   selectedCategory === category.id 
                     ? 'bg-blue-100 text-blue-800' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -304,62 +302,57 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
       {/* Filtri */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2">
-              <Filter size={16} />
-              Filtri
-            </button>
-            
-            <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                </svg>
-              </button>
-            </div>
-        </div>
+     
 
           {/* Filtri dietetici nascosti (si possono mostrare con toggle) */}
-          <div className="mt-4 flex flex-wrap gap-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={dietaryFilters.vegetarian}
-              onChange={(e) => setDietaryFilters(prev => ({ ...prev, vegetarian: e.target.checked }))}
-              className="mr-2"
-            />
-              <span className="text-sm">🌱 Vegetariano</span>
-          </label>
-          
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={dietaryFilters.vegan}
-              onChange={(e) => setDietaryFilters(prev => ({ ...prev, vegan: e.target.checked }))}
-              className="mr-2"
-            />
-              <span className="text-sm">🌿 Vegano</span>
-          </label>
-          
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={dietaryFilters.glutenFree}
-              onChange={(e) => setDietaryFilters(prev => ({ ...prev, glutenFree: e.target.checked }))}
-              className="mr-2"
-            />
-              <span className="text-sm">🌾 Senza Glutine</span>
-          </label>
-          
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={dietaryFilters.spicy}
-              onChange={(e) => setDietaryFilters(prev => ({ ...prev, spicy: e.target.checked }))}
-              className="mr-2"
-            />
-              <span className="text-sm">🌶️ Piccante</span>
-          </label>
+          <div className=" flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setDietaryFilters(prev => ({ ...prev, vegetarian: !prev.vegetarian }))}
+              className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                dietaryFilters.vegetarian
+                  ? 'bg-green-600 text-white border-green-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="mr-1">🌱</span> Vegetariano
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDietaryFilters(prev => ({ ...prev, vegan: !prev.vegan }))}
+              className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                dietaryFilters.vegan
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="mr-1">🌿</span> Vegano
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDietaryFilters(prev => ({ ...prev, glutenFree: !prev.glutenFree }))}
+              className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                dietaryFilters.glutenFree
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="mr-1">🌾</span> Senza Glutine
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDietaryFilters(prev => ({ ...prev, spicy: !prev.spicy }))}
+              className={`cursor-pointer inline-flex items-center px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                dietaryFilters.spicy
+                  ? 'bg-red-600 text-white border-red-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <span className="mr-1">🌶️</span> Piccante
+            </button>
           </div>
         </div>
       </div>
@@ -638,33 +631,7 @@ export default function MenuDisplay({ menu, restaurant, qrCodeId }: MenuDisplayP
                 />
               </div>
 
-              {/* Customer Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nome Cliente
-                </label>
-                <input
-                  type="text"
-                  value={orderData.customerName}
-                  onChange={(e) => setOrderData({...orderData, customerName: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Nome (opzionale)"
-                />
-              </div>
-
-              {/* Customer Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefono
-                </label>
-                <input
-                  type="tel"
-                  value={orderData.customerPhone}
-                  onChange={(e) => setOrderData({...orderData, customerPhone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Telefono (opzionale)"
-                />
-              </div>
+              {/* Solo Note */}
 
               {/* Notes */}
               <div>

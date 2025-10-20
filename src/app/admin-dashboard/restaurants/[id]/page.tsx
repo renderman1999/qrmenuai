@@ -27,6 +27,8 @@ interface Restaurant {
   ordersEnabled: boolean
   chatbotEnabled: boolean
   telegramEnabled: boolean
+  telegramChannelId?: string | null
+  telegramBotToken?: string | null
   licenseTier: string
   createdAt: string
   updatedAt: string
@@ -80,6 +82,12 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
   const [isTogglingOrders, setIsTogglingOrders] = useState(false)
   const [isTogglingChatbot, setIsTogglingChatbot] = useState(false)
   const [isTogglingTelegram, setIsTogglingTelegram] = useState(false)
+  const [isSavingTelegramChannel, setIsSavingTelegramChannel] = useState(false)
+  const [telegramChannelInput, setTelegramChannelInput] = useState('')
+  const [telegramChannelError, setTelegramChannelError] = useState<string | null>(null)
+  const [isSendingTelegramTest, setIsSendingTelegramTest] = useState(false)
+  const [telegramBotTokenInput, setTelegramBotTokenInput] = useState('')
+  const [isTogglingSendOrders, setIsTogglingSendOrders] = useState(false)
   
   // Success feedback states
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -119,6 +127,8 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
         if (foundRestaurant) {
           console.log('🍽️ Found restaurant:', foundRestaurant.name, 'ordersEnabled:', foundRestaurant.ordersEnabled)
           setRestaurant(foundRestaurant)
+          setTelegramChannelInput(foundRestaurant.telegramChannelId || '')
+          setTelegramBotTokenInput(foundRestaurant.telegramBotToken || '')
           // Carica anche articoli e recensioni
           loadArticles(restaurantId)
           loadReviews(restaurantId)
@@ -247,6 +257,62 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
       alert('Errore di connessione. Riprova.')
     } finally {
       setIsTogglingTelegram(false)
+    }
+  }
+
+  const handleSaveTelegramChannel = async () => {
+    if (!restaurant || isSavingTelegramChannel) return
+    // Validazione client-side rapida
+    const v = telegramChannelInput.trim()
+    if (
+      v &&
+      !( /^@[A-Za-z0-9_]{5,32}$/.test(v) || /^-?\d{5,20}$/.test(v) )
+    ) {
+      setTelegramChannelError('Formato non valido. Usa @nome_canale (5-32 chars) o ID numerico')
+      return
+    }
+    setTelegramChannelError(null)
+    setIsSavingTelegramChannel(true)
+    try {
+      const response = await fetch(`/api/restaurants/${restaurant.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          telegramChannelId: telegramChannelInput.trim(),
+          telegramBotToken: telegramBotTokenInput.trim()
+        })
+      })
+      if (response.ok) {
+        const updated = await response.json()
+        setRestaurant(prev => prev ? { ...prev, telegramChannelId: updated.telegramChannelId, telegramBotToken: updated.telegramBotToken } : prev)
+        showSuccess('ID canale Telegram salvato')
+      } else {
+        const err = await response.json()
+        const msg = err.details?.[0]?.message || err.error || 'Impossibile salvare ID canale'
+        setTelegramChannelError(typeof msg === 'string' ? msg : 'Formato non valido')
+      }
+    } catch (e) {
+      alert('Errore di connessione')
+    } finally {
+      setIsSavingTelegramChannel(false)
+    }
+  }
+
+  const handleSendTelegramTest = async () => {
+    if (!restaurant || isSendingTelegramTest) return
+    setIsSendingTelegramTest(true)
+    try {
+      const res = await fetch(`/api/restaurants/${restaurant.id}/telegram-test`, { method: 'POST' })
+      if (res.ok) {
+        showSuccess('Messaggio di test inviato su Telegram')
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Invio fallito')
+      }
+    } catch (e) {
+      alert('Errore di connessione nell\'invio test')
+    } finally {
+      setIsSendingTelegramTest(false)
     }
   }
 
@@ -588,6 +654,84 @@ export default function RestaurantDetailPage({ params }: { params: Promise<{ id:
                   <p className="mt-1 text-xs text-gray-500">
                     Quando abilitato, i clienti possono ricevere notifiche e messaggi tramite Telegram
                   </p>
+                  {restaurant.telegramEnabled && (
+                    <div className="mt-3 flex flex-col gap-2">
+                      <input
+                        type="text"
+                        value={telegramChannelInput}
+                        onChange={(e) => setTelegramChannelInput(e.target.value)}
+                        placeholder="@nome_canale o ID numerico"
+                        className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      />
+                      <input
+                        type="password"
+                        value={telegramBotTokenInput}
+                        onChange={(e) => setTelegramBotTokenInput(e.target.value)}
+                        placeholder="Telegram Bot Token (es. 123456:ABC...)"
+                        className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      />
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                        type="button"
+                        onClick={handleSaveTelegramChannel}
+                        disabled={isSavingTelegramChannel || !!telegramChannelError}
+                        className="cursor-pointer bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
+                        >
+                          {isSavingTelegramChannel ? 'Salvando...' : 'Salva'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSendTelegramTest}
+                          disabled={isSendingTelegramTest || !restaurant.telegramChannelId}
+                          className="cursor-pointer bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 text-sm"
+                        >
+                          {isSendingTelegramTest ? 'Inviando...' : 'Invia test'}
+                        </button>
+                      </div>
+                      <div className="pt-2">
+                        <div className="flex items-center space-x-3">
+                          <div className="relative">
+                            <input
+                              type="checkbox"
+                              id="sendOrdersToTelegram"
+                              checked={restaurant.sendOrdersToTelegram || false}
+                              onChange={async () => {
+                                if (!restaurant) return
+                                if (isTogglingSendOrders) return
+                                setIsTogglingSendOrders(true)
+                                try {
+                                  const resp = await fetch(`/api/restaurants/${restaurant.id}`, {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ sendOrdersToTelegram: !(restaurant.sendOrdersToTelegram || false) })
+                                  })
+                                  if (resp.ok) {
+                                    setRestaurant(prev => prev ? { ...prev, sendOrdersToTelegram: !(prev.sendOrdersToTelegram || false) } : prev)
+                                    showSuccess((restaurant.sendOrdersToTelegram ? 'Invio ordini su Telegram disabilitato' : 'Invio ordini su Telegram abilitato'))
+                                  } else {
+                                    const err = await resp.json()
+                                    alert(err.error || 'Errore aggiornamento')
+                                  }
+                                } finally {
+                                  setIsTogglingSendOrders(false)
+                                }
+                              }}
+                              disabled={isTogglingSendOrders}
+                              className="cursor-pointer h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
+                            />
+                          </div>
+                          <label htmlFor="sendOrdersToTelegram" className="text-sm font-medium text-gray-700">
+                            Invia ordini su Telegram
+                            {isTogglingSendOrders && <span className="ml-2 text-blue-600">Aggiornamento...</span>}
+                          </label>
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">Se attivo, ogni nuovo ordine verrà inviato al canale Telegram configurato.</p>
+                      </div>
+                    </div>
+                  )}
+                  {restaurant.telegramEnabled && telegramChannelError && (
+                    <p className="mt-2 text-xs text-red-600">{telegramChannelError}</p>
+                  )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>

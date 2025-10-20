@@ -307,7 +307,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart, ord
       {/* Chat Modal */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-opacity-0 flex items-end justify-end z-50"
+          className="fixed inset-0 bg-opacity-0 flex items-end justify-end z-50 bottom-4"
           onClick={(e) => {
             // Chiudi solo se si clicca sul backdrop, non sul contenuto
             if (e.target === e.currentTarget) {
@@ -327,7 +327,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart, ord
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-white hover:text-gray-200"
+                className="cursor-pointer text-white hover:text-gray-200"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -423,7 +423,7 @@ export default function Chatbot({ restaurantId, menuId, dishes, onAddToCart, ord
                       }
                       handleCategoryClick(category)
                     }}
-                    className="flex-shrink-0 text-xs px-3 py-2 rounded-full border transition-all duration-200 shadow-sm hover:shadow-md bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200 hover:border-blue-300 hover:scale-105"
+                    className="cursor-pointer flex-shrink-0 text-xs px-3 py-2 rounded-full border transition-all duration-200 shadow-sm hover:shadow-md bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200 hover:border-blue-300 hover:scale-105"
                   >
                     {category}
                   </button>
